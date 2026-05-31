@@ -94,24 +94,38 @@ namespace FileRenamer
                 return;
             }
 
-            var dialogResult = MessageBox.Show("¿Desea renombrar los archivos? Esta accion es irreversible", "Confirmación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var dialogResult = MessageBox.Show("¿Desea renombrar y segmentar los archivos? Se conservarán los multipágina y se limpiarán los pre-segmentados.", "Confirmación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
             if (dialogResult == DialogResult.Yes)
             {
-                var files = Directory.GetFiles(LblFolder.Text, "*.pdf").ToList();
-                files.Sort((x, y) => StrCmpLogicalW(x, y)); // Enforces 1, 2, 3, 10 order
+                var files = Directory.GetFiles(LblFolder.Text, "*.pdf").ToArray();
+                Array.Sort(files, (x, y) => StrCmpLogicalW(x, y)); // Enforces 1, 2, 3, 10 order
 
-                int fileIndex = 0;
+                ProgressForm loadingScreen = new();
+                loadingScreen.StartPosition = FormStartPosition.Manual;
+                int centerX = this.Location.X + (this.Width - loadingScreen.Width) / 2;
+                int centerY = this.Location.Y + (this.Height - loadingScreen.Height) / 2;
+                loadingScreen.Location = new Point(centerX, centerY);
+                loadingScreen.Show(this);
+
+                int currentFileIndex = 0;
+                int internalPageTracker = 1;
+                int successfullyProcessed = 0;
+                int currentRowIndex = 0;
+
+                List<string> filesToDelete = [];
+
                 foreach (DataGridViewRow row in DgvPayments.Rows)
                 {
                     if (row.IsNewRow) continue;
 
-                    if (fileIndex >= files.Count)
+                    if (currentFileIndex >= files.Length)
                     {
-                        MessageBox.Show("Advertencia: La cantidad de filas es mayor a la cantidad de archivos en el folder seleccionado", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("Advertencia: La cantidad de filas es mayor a la cantidad de archivos originales.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         break;
                     }
 
-                    string currentFilePath = files[fileIndex];
+                    string currentFilePath = files[currentFileIndex];
 
                     var datePart = row.Cells[0].Value?.ToString();
                     var vendorPart = row.Cells[2].Value?.ToString();
@@ -119,24 +133,90 @@ namespace FileRenamer
                     var amountPart = row.Cells[4].FormattedValue?.ToString();
                     var currencyPart = row.Cells[5].Value?.ToString();
 
+                    vendorPart = string.Join("_", (vendorPart ?? "UNKNOWN").Split(Path.GetInvalidFileNameChars())).Trim();
+                    conceptPart = string.Join("_", (conceptPart ?? "CONCEPT").Split(Path.GetInvalidFileNameChars())).Trim();
+                    amountPart = string.Join("_", (amountPart ?? "0.00").Split(Path.GetInvalidFileNameChars())).Trim();
+                    currencyPart = string.Join("_", (currencyPart ?? "MXN").Split(Path.GetInvalidFileNameChars())).Trim();
+
                     string directory = Path.GetDirectoryName(currentFilePath);
                     string newFileName = $"{datePart}-{CmbCompany.SelectedItem}-{vendorPart} {conceptPart}-{amountPart} {currencyPart}.pdf";
                     string destinationPath = Path.Combine(directory, newFileName);
 
+                    bool sliceSuccess = false;
+                    int totalPagesInFile = 0;
+
                     try
                     {
-                        File.Move(currentFilePath, destinationPath);
+                        using (PdfReader reader = new PdfReader(currentFilePath))
+                        using (PdfDocument sourcePdfDoc = new PdfDocument(reader))
+                        {
+                            totalPagesInFile = sourcePdfDoc.GetNumberOfPages();
+
+                            using (PdfWriter writer = new PdfWriter(destinationPath))
+                            using (PdfDocument newSinglePagePdf = new PdfDocument(writer))
+                            {
+                                sourcePdfDoc.CopyPagesTo(internalPageTracker, internalPageTracker, newSinglePagePdf);
+                            }
+
+                            if (totalPagesInFile == 1)
+                            {
+                                if (!filesToDelete.Contains(currentFilePath))
+                                {
+                                    filesToDelete.Add(currentFilePath);
+                                }
+                            }
+                        }
+                        sliceSuccess = true;
+                        successfullyProcessed++;
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Failed to rename file {Path.GetFileName(currentFilePath)}: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        loadingScreen.Close();
+                        MessageBox.Show($"Failed to split file {Path.GetFileName(currentFilePath)} on row {successfullyProcessed + 1}: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
 
-                    fileIndex++;
+                    if (sliceSuccess)
+                    {
+                        if (internalPageTracker < totalPagesInFile)
+                        {
+                            internalPageTracker++; 
+                        }
+                        else
+                        {
+                            internalPageTracker = 1; 
+                            currentFileIndex++;     
+                        }
+                    }
+
+                    currentRowIndex++;
+                    Application.DoEvents();
                 }
 
-                MessageBox.Show("Proceso Completado", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                int deletedCount = 0;
+                foreach (string oldFilePath in filesToDelete)
+                {
+                    try
+                    {
+                        if (File.Exists(oldFilePath))
+                        {
+                            File.Delete(oldFilePath);
+                            deletedCount++;
+                        }
+                    }
+                    catch { /* Catch temporary OS locks silently */ }
+                }
+
+                loadingScreen.Close();
+                loadingScreen.Dispose();
+
+                string message = $"Proceso Completado.\nSe crearon {successfullyProcessed} archivos renombrados.";
+                if (deletedCount > 0)
+                {
+                    message += $"\nSe eliminaron {deletedCount} archivos fuente pre-segmentados (los multipágina se conservaron).";
+                }
+
+                MessageBox.Show(message, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -151,40 +231,67 @@ namespace FileRenamer
             //if (folderDialog.ShowDialog() == DialogResult.OK)
             //{
             DgvPayments.Rows.Clear();
-            var files = Directory.GetFiles(@"C:\Users\455198\Downloads\20260529-WOREGG-", "*.pdf").ToList();
+            var sourceDirectory = @"C:\Users\455198\Downloads\20260529-WOREGG-1";
+            var files = Directory.GetFiles(sourceDirectory, "*.pdf").ToList();
             files.Sort((x, y) => StrCmpLogicalW(x, y));
 
             ProgressForm loadingScreen = new();
-            // Force the start position to manual so it obeys our custom coordinates
             loadingScreen.StartPosition = FormStartPosition.Manual;
-
-            // 2. MANUAL MATH: Calculate the exact dead-center coordinates of the main form
             int centerX = this.Location.X + (this.Width - loadingScreen.Width) / 2;
             int centerY = this.Location.Y + (this.Height - loadingScreen.Height) / 2;
 
-            // Assign the calculated point to the loading screen
             loadingScreen.Location = new Point(centerX, centerY);
 
-            // 3. Display the form smoothly
             loadingScreen.Show(this);
 
-            int currentFileIndex = 1;
+            int fileCounter = 1;
 
             foreach (string filePath in files)
             {
-                loadingScreen.Controls["lblStatus"].Text = $"Procesando PDF {currentFileIndex} de {files.Count}...";
                 string fileNameOnly = Path.GetFileName(filePath);
-
-                // Extract the raw text layout using the method we just built
-                string rawPdfText = ExtractTextFromPdf(filePath);
-
-                // Skip processing if the file was empty or unreadable
-                if (string.IsNullOrWhiteSpace(rawPdfText)) continue;
-
-                ExtractPdfDataPoints(rawPdfText, out string extractedAmount, out string extractedVendorName, out string extractedReason, out string extractedCurrency);
-                DgvPayments.Rows.Add(DateTime.Now.ToString("yyyyMMdd"), fileNameOnly, extractedVendorName, extractedReason, extractedAmount, extractedCurrency);
-                currentFileIndex++;
+                loadingScreen.Controls["lblStatus"].Text = $"Procesando Archivo {fileCounter} de {files.Count}: {fileNameOnly}...";
                 Application.DoEvents();
+                try
+                {
+                    using PdfReader pdfReader = new(filePath);
+                    using PdfDocument pdfDoc = new(pdfReader);
+                    int totalPages = pdfDoc.GetNumberOfPages();
+
+                    // Loop through every single page inside this specific PDF
+                    for (int pageNum = 1; pageNum <= totalPages; pageNum++)
+                    {
+                        // Update loading screen to show sub-page progress if it's a big document
+                        if (totalPages > 1)
+                        {
+                            loadingScreen.Controls["lblStatus"].Text = $"Processing {fileNameOnly} (Page {pageNum}/{totalPages})...";
+                            Application.DoEvents();
+                        }
+
+                        // Extract the text from ONLY this specific page
+                        string pageText = iText.Kernel.Pdf.Canvas.Parser.PdfTextExtractor.GetTextFromPage(pdfDoc.GetPage(pageNum));
+
+                        if (string.IsNullOrWhiteSpace(pageText)) continue;
+
+                        // Run your pristine 4-point magic extraction on this page's text!
+
+                        ExtractPdfDataPoints(pageText, out string extractedAmount, out string extractedVendorName, out string extractedReason, out string extractedCurrency);
+
+                        string extractedDate = DateTime.Now.ToString("yyyyMMdd");
+
+                        // Modify the displayed filename so the user knows exactly which page the data came from
+                        string gridFileName = totalPages > 1 ? $"{Path.GetFileNameWithoutExtension(fileNameOnly)}_Pg{pageNum}.pdf" : fileNameOnly;
+
+                        // Add the record directly to your grid!
+                        DgvPayments.Rows.Add(DateTime.Now.ToString("yyyyMMdd"), fileNameOnly, extractedVendorName, extractedReason, extractedAmount, extractedCurrency);
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // If a single PDF is corrupted, don't crash the entire machine—skip it and log it!
+                    string extractedDate = DateTime.Now.ToString("yyyyMMdd");
+                    DgvPayments.Rows.Add(extractedDate, fileNameOnly, "ERROR", "Failed to parse file", ex.Message, "");
+                }                
             }
             DgvPayments.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
             loadingScreen.Close();
@@ -192,44 +299,8 @@ namespace FileRenamer
             MessageBox.Show($"Se escanearon y cargaron {files.Count} archivos en la tabla!", "Escaneo Completado", MessageBoxButtons.OK, MessageBoxIcon.Information);
             //TODO: Revert this line
             //LblFolder.Text = folderDialog.SelectedPath;
-            LblFolder.Text = @"C:\Users\455198\Downloads\20260529-WOREGG-";
+            LblFolder.Text = sourceDirectory;
             //}
-        }
-
-        private static string ExtractTextFromPdf(string filePath)
-        {
-            // Double check that the file actually exists before trying to read it
-            if (!File.Exists(filePath))
-            {
-                throw new FileNotFoundException($"The system could not find the file at: {filePath}");
-            }
-
-            var pdfTextContent = new StringBuilder();
-
-            try
-            {
-                // 1. Initialize the iText readers
-                using var reader = new PdfReader(filePath);
-                using var pdfDoc = new PdfDocument(reader);
-                // 2. Loop through every page (iText pages are 1-indexed, not 0-indexed!)
-                for (int pageNum = 1; pageNum <= pdfDoc.GetNumberOfPages(); pageNum++)
-                {
-                    // Extract the text layout from the current page
-                    string pageText = PdfTextExtractor.GetTextFromPage(pdfDoc.GetPage(pageNum));
-
-                    // Append it to our main data block with a newline breakdown
-                    pdfTextContent.AppendLine(pageText);
-                }
-            }
-            catch (Exception ex)
-            {
-                // Catch password-protected PDFs or corrupted files gracefully
-                MessageBox.Show($"Error al intentar leer archivo en ruta: {Path.GetFileName(filePath)}: {ex.Message}",
-                                "Error de lectura de PDF", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return string.Empty;
-            }
-
-            return pdfTextContent.ToString();
         }
 
         private static string CleanseAndHealText(string rawText)
