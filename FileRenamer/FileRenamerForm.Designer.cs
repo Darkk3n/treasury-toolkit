@@ -193,7 +193,7 @@
             // TxtConsecutive
             // 
             TxtConsecutive.BorderStyle = BorderStyle.FixedSingle;
-            TxtConsecutive.Location = new Point(543, 22);
+            TxtConsecutive.Location = new Point(545, 22);
             TxtConsecutive.Margin = new Padding(4);
             TxtConsecutive.Name = "TxtConsecutive";
             TxtConsecutive.Size = new Size(152, 29);

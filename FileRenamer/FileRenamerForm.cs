@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using iText.Kernel.Pdf;
 using Microsoft.VisualBasic.FileIO;
@@ -252,6 +253,19 @@ namespace FileRenamer
             }
 
             MessageBox.Show(message, "Exito!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = $"\"{LblFolder.Text}\"",
+                    //Arguments = $"\"{LblFolder.Text}\"",
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"No se pudo abrir la carpeta: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void BtnFileDialog_Click(object sender, EventArgs e)
@@ -293,37 +307,30 @@ namespace FileRenamer
                     using PdfDocument pdfDoc = new(pdfReader);
                     int totalPages = pdfDoc.GetNumberOfPages();
 
-                    // Loop through every single page inside this specific PDF
                     for (int pageNum = 1; pageNum <= totalPages; pageNum++)
                     {
-                        // Update loading screen to show sub-page progress if it's a big document
                         if (totalPages > 1)
                         {
-                            loadingScreen.Controls["lblStatus"].Text = $"Processing {fileNameOnly} (Page {pageNum}/{totalPages})...";
+                            loadingScreen.Controls["lblStatus"].Text = $"Procesando {fileNameOnly} (Pagina {pageNum}/{totalPages})...";
                             Application.DoEvents();
                         }
 
-                        // Extract the text from ONLY this specific page
                         string pageText = iText.Kernel.Pdf.Canvas.Parser.PdfTextExtractor.GetTextFromPage(pdfDoc.GetPage(pageNum));
 
                         if (string.IsNullOrWhiteSpace(pageText)) continue;
 
-                        // Run your pristine 4-point magic extraction on this page's text!
 
                         ExtractPdfDataPoints(pageText, out string extractedAmount, out string extractedVendorName, out string extractedReason, out string extractedCurrency);
 
 
-                        // Modify the displayed filename so the user knows exactly which page the data came from
                         string gridFileName = totalPages > 1 ? $"{Path.GetFileNameWithoutExtension(fileNameOnly)}_Pg{pageNum}.pdf" : fileNameOnly;
 
-                        // Add the record directly to your grid!
                         DgvPayments.Rows.Add(extractedDate, fileNameOnly, extractedVendorName, extractedReason, extractedAmount, extractedCurrency);
 
                     }
                 }
                 catch (Exception ex)
                 {
-                    // If a single PDF is corrupted, don't crash the entire machine—skip it and log it!
                     extractedDate = DateTime.Now.ToString("yyyyMMdd");
                     DgvPayments.Rows.Add(extractedDate, fileNameOnly, "ERROR", "Failed to parse file", ex.Message, "");
                 }
