@@ -258,7 +258,6 @@ namespace FileRenamer
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = $"\"{LblFolder.Text}\"",
-                    //Arguments = $"\"{LblFolder.Text}\"",
                     UseShellExecute = true
                 });
             }
