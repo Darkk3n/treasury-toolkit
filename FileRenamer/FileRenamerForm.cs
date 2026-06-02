@@ -260,6 +260,8 @@ namespace FileRenamer
             //TODO: Revert this
             //if (folderDialog.ShowDialog() == DialogResult.OK)
             //{
+            string extractedDate = DgvPayments.Rows[0].Cells[0].Value.ToString();
+
             DgvPayments.Rows.Clear();
             var sourceDirectory = @"C:\Users\455198\Downloads\Renombrar";
             var files = Directory.GetFiles(sourceDirectory, "*.pdf").ToList();
@@ -306,20 +308,19 @@ namespace FileRenamer
 
                         ExtractPdfDataPoints(pageText, out string extractedAmount, out string extractedVendorName, out string extractedReason, out string extractedCurrency);
 
-                        string extractedDate = DateTime.Now.ToString("yyyyMMdd");
 
                         // Modify the displayed filename so the user knows exactly which page the data came from
                         string gridFileName = totalPages > 1 ? $"{Path.GetFileNameWithoutExtension(fileNameOnly)}_Pg{pageNum}.pdf" : fileNameOnly;
 
                         // Add the record directly to your grid!
-                        DgvPayments.Rows.Add(DateTime.Now.ToString("yyyyMMdd"), fileNameOnly, extractedVendorName, extractedReason, extractedAmount, extractedCurrency);
+                        DgvPayments.Rows.Add(extractedDate, fileNameOnly, extractedVendorName, extractedReason, extractedAmount, extractedCurrency);
 
                     }
                 }
                 catch (Exception ex)
                 {
                     // If a single PDF is corrupted, don't crash the entire machine—skip it and log it!
-                    string extractedDate = DateTime.Now.ToString("yyyyMMdd");
+                    extractedDate = DateTime.Now.ToString("yyyyMMdd");
                     DgvPayments.Rows.Add(extractedDate, fileNameOnly, "ERROR", "Failed to parse file", ex.Message, "");
                 }
             }
