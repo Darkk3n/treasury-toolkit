@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Text.Json;
+using System.Text.RegularExpressions;
 using iText.Kernel.Pdf;
 using Microsoft.VisualBasic.FileIO;
 
@@ -6,6 +7,7 @@ namespace FileRenamer
 {
     public partial class FileRenamerForm : Form
     {
+        private readonly string settingsFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appsettings.local.json");
         readonly string formattedDate = DateTime.Now.Date.ToString("yyyyMMdd");
         [System.Runtime.InteropServices.DllImport("shlwapi.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
 #pragma warning disable SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
@@ -21,6 +23,7 @@ namespace FileRenamer
         {
             CmbCompany.SelectedIndex = 0;
             SetupGrid();
+            LoadSettings();
         }
 
         private void SetupGrid()
@@ -513,15 +516,13 @@ namespace FileRenamer
             Color formBg = isDarkMode ? Color.FromArgb(30, 30, 30) : Color.FromKnownColor(KnownColor.ControlLightLight);
             Color controlBg = isDarkMode ? Color.FromArgb(45, 45, 48) : Color.White;
             Color textColor = isDarkMode ? Color.White : Color.FromArgb(51, 51, 51);
-            Color buttonBg = isDarkMode ? Color.FromArgb(0, 122, 204) : Color.SlateBlue; // Modern VS Blue vs Slate Blue
+            Color buttonBg = isDarkMode ? Color.FromArgb(0, 122, 204) : Color.FromKnownColor(KnownColor.ControlLightLight);
 
             // 1. Paint the main form background
             this.BackColor = formBg;
 
-            // 2. Loop through every single control on the form automatically
             foreach (Control c in this.Controls)
             {
-                // Handle TextBoxes and ComboBoxes
                 if (c is TextBox || c is ComboBox || c is NumericUpDown)
                 {
                     c.BackColor = controlBg;
@@ -531,21 +532,19 @@ namespace FileRenamer
                 else if (c is Button btn)
                 {
                     btn.BackColor = buttonBg;
-                    btn.ForeColor = Color.White;
+                    btn.ForeColor = isDarkMode ? Color.White : Color.Black;
                 }
-                // Handle Labels
                 else if (c is Label)
                 {
                     c.ForeColor = textColor;
                     c.BackColor = controlBg;
 
                 }
-                else if(c is CheckBox)
+                else if (c is CheckBox)
                 {
                     c.ForeColor = textColor;
 
                 }
-                // Handle your DataGridView
                 else if (c is DataGridView dgv)
                 {
                     dgv.BackgroundColor = controlBg;
@@ -559,6 +558,35 @@ namespace FileRenamer
         private void ChkDarkMode_CheckedChanged(object sender, EventArgs e)
         {
             ApplyTheme(ChkDarkMode.Checked);
+            SaveSettings();
+        }
+
+        private void SaveSettings()
+        {
+            var settings = new LocalAppSettings { IsDarkMode = ChkDarkMode.Checked };
+            string json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(settingsFilePath, json);
+        }
+
+        private void LoadSettings()
+        {
+            if (File.Exists(settingsFilePath))
+            {
+                try
+                {
+                    string json = File.ReadAllText(settingsFilePath);
+                    var settings = JsonSerializer.Deserialize<LocalAppSettings>(json);
+
+                    if (settings != null)
+                    {
+                        ChkDarkMode.Checked = settings.IsDarkMode;
+                    }
+                }
+                catch
+                {
+                    ChkDarkMode.Checked = false;
+                }
+            }
         }
     }
 }
