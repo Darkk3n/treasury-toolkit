@@ -241,7 +241,7 @@ namespace FileRenamer
                 {
                     backupFolder = Path.Combine(Directory.GetParent(sourceFolder).FullName, Path.GetFileName(sourceFolder) + "_Backup_" + DateTime.Now.ToString("yyyyMMdd"));
                     FileSystem.CopyDirectory(
-                        sourceFolder, backupFolder,  UIOption.OnlyErrorDialogs, UICancelOption.DoNothing);
+                        sourceFolder, backupFolder, UIOption.OnlyErrorDialogs, UICancelOption.DoNothing);
                 }
                 catch (Exception)
                 {
@@ -463,6 +463,25 @@ namespace FileRenamer
                 }
             }
             #endregion
+        }
+
+        private void TxtConsecutive_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
+            {
+                // e.Handled = true means "we handled this event, ignore the keystroke"
+                e.Handled = true;
+            }
+        }
+
+        private void CmbCompany_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            LblConsecutive.Visible = CmbCompany.SelectedIndex != 0 && CmbCompany.SelectedItem.ToString() == "EMKA";
+            TxtConsecutive.Visible = CmbCompany.SelectedIndex != 0 && CmbCompany.SelectedItem.ToString() == "EMKA";
+            if (CmbCompany.SelectedItem.ToString() != "EMKA")
+            {
+                TxtConsecutive.Text = string.Empty;
+            }
         }
     }
 }

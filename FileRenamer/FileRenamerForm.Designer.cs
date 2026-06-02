@@ -42,6 +42,8 @@
             label2 = new Label();
             LblFolder = new Label();
             BtnFileDialog = new Button();
+            LblConsecutive = new Label();
+            TxtConsecutive = new TextBox();
             ((System.ComponentModel.ISupportInitialize)DgvPayments).BeginInit();
             SuspendLayout();
             // 
@@ -118,6 +120,7 @@
             CmbCompany.Name = "CmbCompany";
             CmbCompany.Size = new Size(131, 23);
             CmbCompany.TabIndex = 3;
+            CmbCompany.SelectedIndexChanged += CmbCompany_SelectedIndexChanged;
             // 
             // BtnStart
             // 
@@ -157,11 +160,32 @@
             BtnFileDialog.UseVisualStyleBackColor = true;
             BtnFileDialog.Click += BtnFileDialog_Click;
             // 
+            // LblConsecutive
+            // 
+            LblConsecutive.AutoSize = true;
+            LblConsecutive.Location = new Point(362, 16);
+            LblConsecutive.Name = "LblConsecutive";
+            LblConsecutive.Size = new Size(76, 15);
+            LblConsecutive.TabIndex = 8;
+            LblConsecutive.Text = "Consecutivo:";
+            LblConsecutive.Visible = false;
+            // 
+            // TxtConsecutive
+            // 
+            TxtConsecutive.Location = new Point(444, 11);
+            TxtConsecutive.Name = "TxtConsecutive";
+            TxtConsecutive.Size = new Size(119, 23);
+            TxtConsecutive.TabIndex = 9;
+            TxtConsecutive.Visible = false;
+            TxtConsecutive.KeyPress += TxtConsecutive_KeyPress;
+            // 
             // FileRenamerForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1017, 459);
+            Controls.Add(TxtConsecutive);
+            Controls.Add(LblConsecutive);
             Controls.Add(BtnFileDialog);
             Controls.Add(LblFolder);
             Controls.Add(label2);
@@ -195,5 +219,7 @@
         private DataGridViewTextBoxColumn dgvPaymentsColConcept;
         private DataGridViewTextBoxColumn dgvPaymentsColAmount;
         private DataGridViewTextBoxColumn Column2;
+        private Label LblConsecutive;
+        private TextBox TxtConsecutive;
     }
 }
