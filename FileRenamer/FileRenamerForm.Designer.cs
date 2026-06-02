@@ -44,6 +44,7 @@
             BtnFileDialog = new Button();
             LblConsecutive = new Label();
             TxtConsecutive = new TextBox();
+            ChkDarkMode = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)DgvPayments).BeginInit();
             SuspendLayout();
             // 
@@ -200,12 +201,24 @@
             TxtConsecutive.Visible = false;
             TxtConsecutive.KeyPress += TxtConsecutive_KeyPress;
             // 
+            // ChkDarkMode
+            // 
+            ChkDarkMode.AutoSize = true;
+            ChkDarkMode.Location = new Point(1160, 12);
+            ChkDarkMode.Name = "ChkDarkMode";
+            ChkDarkMode.Size = new Size(124, 25);
+            ChkDarkMode.TabIndex = 10;
+            ChkDarkMode.Text = "Modo Oscuro";
+            ChkDarkMode.UseVisualStyleBackColor = true;
+            ChkDarkMode.CheckedChanged += ChkDarkMode_CheckedChanged;
+            // 
             // FileRenamerForm
             // 
             AutoScaleDimensions = new SizeF(9F, 21F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
             ClientSize = new Size(1308, 643);
+            Controls.Add(ChkDarkMode);
             Controls.Add(TxtConsecutive);
             Controls.Add(LblConsecutive);
             Controls.Add(BtnFileDialog);
@@ -247,5 +260,6 @@
         private DataGridViewTextBoxColumn Column2;
         private Label LblConsecutive;
         private TextBox TxtConsecutive;
+        private CheckBox ChkDarkMode;
     }
 }

@@ -506,5 +506,59 @@ namespace FileRenamer
                 TxtConsecutive.Text = string.Empty;
             }
         }
+
+        private void ApplyTheme(bool isDarkMode)
+        {
+            // Define your color palettes
+            Color formBg = isDarkMode ? Color.FromArgb(30, 30, 30) : Color.FromKnownColor(KnownColor.ControlLightLight);
+            Color controlBg = isDarkMode ? Color.FromArgb(45, 45, 48) : Color.White;
+            Color textColor = isDarkMode ? Color.White : Color.FromArgb(51, 51, 51);
+            Color buttonBg = isDarkMode ? Color.FromArgb(0, 122, 204) : Color.SlateBlue; // Modern VS Blue vs Slate Blue
+
+            // 1. Paint the main form background
+            this.BackColor = formBg;
+
+            // 2. Loop through every single control on the form automatically
+            foreach (Control c in this.Controls)
+            {
+                // Handle TextBoxes and ComboBoxes
+                if (c is TextBox || c is ComboBox || c is NumericUpDown)
+                {
+                    c.BackColor = controlBg;
+                    c.ForeColor = textColor;
+                }
+                // Handle Buttons
+                else if (c is Button btn)
+                {
+                    btn.BackColor = buttonBg;
+                    btn.ForeColor = Color.White;
+                }
+                // Handle Labels
+                else if (c is Label)
+                {
+                    c.ForeColor = textColor;
+                    c.BackColor = controlBg;
+
+                }
+                else if(c is CheckBox)
+                {
+                    c.ForeColor = textColor;
+
+                }
+                // Handle your DataGridView
+                else if (c is DataGridView dgv)
+                {
+                    dgv.BackgroundColor = controlBg;
+                    dgv.DefaultCellStyle.BackColor = controlBg;
+                    dgv.DefaultCellStyle.ForeColor = textColor;
+                    dgv.GridColor = isDarkMode ? Color.FromArgb(63, 63, 70) : Color.LightGray;
+                }
+            }
+        }
+
+        private void ChkDarkMode_CheckedChanged(object sender, EventArgs e)
+        {
+            ApplyTheme(ChkDarkMode.Checked);
+        }
     }
 }
