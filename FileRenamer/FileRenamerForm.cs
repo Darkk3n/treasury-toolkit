@@ -86,7 +86,7 @@ namespace FileRenamer
                 MessageBox.Show("Seleccione una empresa para continuar", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            if (!Directory.Exists(LblFolder.Text))
+            if (LblFolder.Text == "..." || !Directory.Exists(LblFolder.Text))
             {
                 MessageBox.Show("Seleccione una carpeta para continuar", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -99,157 +99,159 @@ namespace FileRenamer
 
             var dialogResult = MessageBox.Show("¿Desea renombrar y segmentar los archivos? Se conservarán los multipágina y se limpiarán los pre-segmentados.", "Confirmación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
-            if (dialogResult == DialogResult.Yes)
+            if (dialogResult == DialogResult.No)
             {
-                var backupFolder = BackupSourceFiles(LblFolder.Text);
-                var files = Directory.GetFiles(LblFolder.Text, "*.pdf").ToArray();
-                Array.Sort(files, (x, y) => StrCmpLogicalW(x, y)); // Enforces 1, 2, 3, 10 order
+                return;
+            }
 
-                ProgressForm loadingScreen = new()
+            var backupFolder = BackupSourceFiles(LblFolder.Text);
+            var files = Directory.GetFiles(LblFolder.Text, "*.pdf").ToArray();
+            Array.Sort(files, (x, y) => StrCmpLogicalW(x, y)); // Enforces 1, 2, 3, 10 order
+
+            ProgressForm loadingScreen = new()
+            {
+                StartPosition = FormStartPosition.Manual
+            };
+            int centerX = this.Location.X + (this.Width - loadingScreen.Width) / 2;
+            int centerY = this.Location.Y + (this.Height - loadingScreen.Height) / 2;
+            loadingScreen.Location = new Point(centerX, centerY);
+            loadingScreen.Show(this);
+
+            int currentFileIndex = 0;
+            int internalPageTracker = 1;
+            int successfullyProcessed = 0;
+            int currentRowIndex = 0;
+
+            List<string> filesToDelete = [];
+            var consecutiveNumber = 0;
+            if (TxtConsecutive.Text != string.Empty)
+            {
+                consecutiveNumber = int.Parse(TxtConsecutive.Text);
+            }
+            var useConsecutive = CmbCompany.SelectedItem.ToString() == "EMKA";
+            foreach (DataGridViewRow row in DgvPayments.Rows)
+            {
+                if (row.IsNewRow) continue;
+
+                if (useConsecutive)
                 {
-                    StartPosition = FormStartPosition.Manual
-                };
-                int centerX = this.Location.X + (this.Width - loadingScreen.Width) / 2;
-                int centerY = this.Location.Y + (this.Height - loadingScreen.Height) / 2;
-                loadingScreen.Location = new Point(centerX, centerY);
-                loadingScreen.Show(this);
-
-                int currentFileIndex = 0;
-                int internalPageTracker = 1;
-                int successfullyProcessed = 0;
-                int currentRowIndex = 0;
-
-                List<string> filesToDelete = [];
-                var consecutiveNumber = 0;
-                if (TxtConsecutive.Text != string.Empty)
-                {
-                    consecutiveNumber = int.Parse(TxtConsecutive.Text);
-                }
-                var useConsecutive = CmbCompany.SelectedItem.ToString() == "EMKA";
-                foreach (DataGridViewRow row in DgvPayments.Rows)
-                {
-                    if (row.IsNewRow) continue;
-
-                    if (useConsecutive)
-                    {
-                        consecutiveNumber = row.Index == 0 ? consecutiveNumber : consecutiveNumber + 1;
-                    }
-
-                    if (currentFileIndex >= files.Length)
-                    {
-                        MessageBox.Show("Advertencia: La cantidad de filas es mayor a la cantidad de archivos originales.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        break;
-                    }
-
-                    string currentFilePath = files[currentFileIndex];
-
-                    var datePart = row.Cells[0].Value?.ToString();
-                    var vendorPart = row.Cells[2].Value?.ToString();
-                    var conceptPart = row.Cells[3].Value?.ToString();
-                    var amountPart = row.Cells[4].FormattedValue?.ToString();
-                    var currencyPart = row.Cells[5].Value?.ToString();
-
-                    vendorPart = string.Join("_", (vendorPart ?? "UNKNOWN").Split(Path.GetInvalidFileNameChars())).Trim();
-                    conceptPart = string.Join("_", (conceptPart ?? "CONCEPT").Split(Path.GetInvalidFileNameChars())).Trim();
-                    amountPart = string.Join("_", (amountPart ?? "0.00").Split(Path.GetInvalidFileNameChars())).Trim();
-                    currencyPart = string.Join("_", (currencyPart ?? "MXN").Split(Path.GetInvalidFileNameChars())).Trim();
-
-                    string directory = Path.GetDirectoryName(currentFilePath);
-                    var newFileName = string.Empty;
-                    var consecutivePart = useConsecutive ? $"{consecutiveNumber}-" : "";
-
-                    newFileName = $"{datePart}-{CmbCompany.SelectedItem}-{consecutivePart}{vendorPart} {conceptPart}-{amountPart} {currencyPart}.pdf";
-
-                    var destinationPath = Path.Combine(directory, newFileName);
-
-                    var sliceSuccess = false;
-                    var totalPagesInFile = 0;
-
-                    try
-                    {
-                        using (PdfReader reader = new(currentFilePath))
-                        using (PdfDocument sourcePdfDoc = new(reader))
-                        {
-                            totalPagesInFile = sourcePdfDoc.GetNumberOfPages();
-
-                            using (PdfWriter writer = new(destinationPath))
-                            using (PdfDocument newSinglePagePdf = new(writer))
-                            {
-                                sourcePdfDoc.CopyPagesTo(internalPageTracker, internalPageTracker, newSinglePagePdf);
-                            }
-
-                            if (totalPagesInFile == 1)
-                            {
-                                if (!filesToDelete.Contains(currentFilePath))
-                                {
-                                    filesToDelete.Add(currentFilePath);
-                                }
-                            }
-                        }
-                        sliceSuccess = true;
-                        successfullyProcessed++;
-                    }
-                    catch (Exception ex)
-                    {
-                        loadingScreen.Close();
-                        MessageBox.Show($"Failed to split file {Path.GetFileName(currentFilePath)} on row {successfullyProcessed + 1}: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-
-                    if (sliceSuccess)
-                    {
-                        if (internalPageTracker < totalPagesInFile)
-                        {
-                            internalPageTracker++;
-                        }
-                        else
-                        {
-                            internalPageTracker = 1;
-                            currentFileIndex++;
-                        }
-                    }
-
-                    currentRowIndex++;
-                    Application.DoEvents();
+                    consecutiveNumber = row.Index == 0 ? consecutiveNumber : consecutiveNumber + 1;
                 }
 
-                int deletedCount = 0;
-                foreach (string oldFilePath in filesToDelete)
+                if (currentFileIndex >= files.Length)
                 {
-                    try
-                    {
-                        if (File.Exists(oldFilePath))
-                        {
-                            File.Delete(oldFilePath);
-                            deletedCount++;
-                        }
-                    }
-                    catch { /* Catch temporary OS locks silently */ }
+                    MessageBox.Show("Advertencia: La cantidad de filas es mayor a la cantidad de archivos originales.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    break;
                 }
 
-                loadingScreen.Close();
-                loadingScreen.Dispose();
+                string currentFilePath = files[currentFileIndex];
 
-                string message = $"Proceso Completado.\nSe crearon {successfullyProcessed} archivos renombrados.";
-                if (deletedCount > 0)
-                {
-                    message += $"\nSe eliminaron {deletedCount} archivos fuente pre-segmentados (los multipágina se conservaron).";
-                }
+                var datePart = row.Cells[0].Value?.ToString();
+                var vendorPart = row.Cells[2].Value?.ToString();
+                var conceptPart = row.Cells[3].Value?.ToString();
+                var amountPart = row.Cells[4].FormattedValue?.ToString();
+                var currencyPart = row.Cells[5].Value?.ToString();
+
+                vendorPart = string.Join("_", (vendorPart ?? "UNKNOWN").Split(Path.GetInvalidFileNameChars())).Trim();
+                conceptPart = string.Join("_", (conceptPart ?? "CONCEPT").Split(Path.GetInvalidFileNameChars())).Trim();
+                amountPart = string.Join("_", (amountPart ?? "0.00").Split(Path.GetInvalidFileNameChars())).Trim();
+                currencyPart = string.Join("_", (currencyPart ?? "MXN").Split(Path.GetInvalidFileNameChars())).Trim();
+
+                string directory = Path.GetDirectoryName(currentFilePath);
+                var newFileName = string.Empty;
+                var consecutivePart = useConsecutive ? $"{consecutiveNumber}-" : "";
+
+                newFileName = $"{datePart}-{CmbCompany.SelectedItem}-{consecutivePart}{vendorPart} {conceptPart}-{amountPart} {currencyPart}.pdf";
+
+                var destinationPath = Path.Combine(directory, newFileName);
+
+                var sliceSuccess = false;
+                var totalPagesInFile = 0;
 
                 try
                 {
-                    if (Directory.Exists(backupFolder))
+                    using (PdfReader reader = new(currentFilePath))
+                    using (PdfDocument sourcePdfDoc = new(reader))
                     {
-                        Directory.Delete(backupFolder, true);
+                        totalPagesInFile = sourcePdfDoc.GetNumberOfPages();
+
+                        using (PdfWriter writer = new(destinationPath))
+                        using (PdfDocument newSinglePagePdf = new(writer))
+                        {
+                            sourcePdfDoc.CopyPagesTo(internalPageTracker, internalPageTracker, newSinglePagePdf);
+                        }
+
+                        if (totalPagesInFile == 1)
+                        {
+                            if (!filesToDelete.Contains(currentFilePath))
+                            {
+                                filesToDelete.Add(currentFilePath);
+                            }
+                        }
                     }
+                    sliceSuccess = true;
+                    successfullyProcessed++;
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Nota: El proceso terminó con éxito, pero no se pudo eliminar la carpeta temporal de respaldo: {ex.Message}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    loadingScreen.Close();
+                    MessageBox.Show($"Failed to split file {Path.GetFileName(currentFilePath)} on row {successfullyProcessed + 1}: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
 
-                MessageBox.Show(message, "Exito!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (sliceSuccess)
+                {
+                    if (internalPageTracker < totalPagesInFile)
+                    {
+                        internalPageTracker++;
+                    }
+                    else
+                    {
+                        internalPageTracker = 1;
+                        currentFileIndex++;
+                    }
+                }
+
+                currentRowIndex++;
+                Application.DoEvents();
             }
+
+            int deletedCount = 0;
+            foreach (string oldFilePath in filesToDelete)
+            {
+                try
+                {
+                    if (File.Exists(oldFilePath))
+                    {
+                        File.Delete(oldFilePath);
+                        deletedCount++;
+                    }
+                }
+                catch { /* Catch temporary OS locks silently */ }
+            }
+
+            loadingScreen.Close();
+            loadingScreen.Dispose();
+
+            string message = $"Proceso Completado.\nSe crearon {successfullyProcessed} archivos renombrados.";
+            if (deletedCount > 0)
+            {
+                message += $"\nSe eliminaron {deletedCount} archivos fuente pre-segmentados (los multipágina se conservaron).";
+            }
+
+            try
+            {
+                if (Directory.Exists(backupFolder))
+                {
+                    Directory.Delete(backupFolder, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Nota: El proceso terminó con éxito, pero no se pudo eliminar la carpeta temporal de respaldo: {ex.Message}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+            MessageBox.Show(message, "Exito!", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void BtnFileDialog_Click(object sender, EventArgs e)
@@ -594,7 +596,7 @@ namespace FileRenamer
                     ChkDarkMode.Checked = false;
                 }
             }
-        } 
+        }
         #endregion
     }
 }
