@@ -12,6 +12,7 @@
   <ItemGroup>
     <PackageReference Include="itext" Version="9.6.0" />
     <PackageReference Include="itext.bouncy-castle-adapter" Version="9.6.0" />
+    <PackageReference Include="itext.font-asian" Version="9.6.0" />
   </ItemGroup>
 
   <ItemGroup>
