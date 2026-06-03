@@ -1,7 +1,10 @@
 ﻿using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using iText.Forms;
 using iText.Kernel.Pdf;
+using iText.Kernel.Pdf.Canvas;
 using Microsoft.VisualBasic.FileIO;
 
 namespace FileRenamer
@@ -171,7 +174,10 @@ namespace FileRenamer
 
                 try
                 {
-                    using (PdfReader reader = new(currentFilePath))
+                    ReaderProperties readerProperties = new();
+                    readerProperties.SetPassword(Encoding.UTF8.GetBytes(""));
+
+                    using (PdfReader reader = new(currentFilePath, readerProperties))
                     using (PdfDocument sourcePdfDoc = new(reader))
                     {
                         totalPagesInFile = sourcePdfDoc.GetNumberOfPages();
@@ -179,7 +185,15 @@ namespace FileRenamer
                         using (PdfWriter writer = new(destinationPath))
                         using (PdfDocument newSinglePagePdf = new(writer))
                         {
-                            sourcePdfDoc.CopyPagesTo(internalPageTracker, internalPageTracker, newSinglePagePdf);
+                            if (CmbCompany.SelectedItem.ToString() == "EMKA")
+                            {
+                                SliceSecuredPage(sourcePdfDoc, newSinglePagePdf, internalPageTracker);
+                            }
+                            else
+                            {
+                                // Original high-performance path for standard files
+                                sourcePdfDoc.CopyPagesTo(internalPageTracker, internalPageTracker, newSinglePagePdf);
+                            }
                         }
 
                         if (totalPagesInFile == 1)
@@ -281,7 +295,7 @@ namespace FileRenamer
 
             DgvPayments.Rows.Clear();
             var sourceDirectory = @"C:\Users\455198\Downloads\Renombrar";
-            var files = Directory.GetFiles(sourceDirectory, "*.pdf").ToList();
+            var files = Directory.GetFiles(sourceDirectory, "*.pdf", System.IO.SearchOption.TopDirectoryOnly).ToList();
             files.Sort((x, y) => StrCmpLogicalW(x, y));
 
             ProgressForm loadingScreen = new();
@@ -429,18 +443,20 @@ namespace FileRenamer
             // --- 1. REAL AMOUNT EXTRACTION (Importe) ---
             // This pattern captures "Importe:", any spaces, and numbers formatted like 12,345.00
             // The \. ensures it looks for a literal period right before the cents
-            string amountPattern = @"Importe:\s*([0-9.,]+\.[0-9]{2})";
+            #region Amount
+            string amountPattern = @"(?:Importe:|Monto:)\s*([0-9.,]+\.[0-9]{2})";
 
             Match amountMatch = Regex.Match(rawPdfText, amountPattern, RegexOptions.IgnoreCase);
             if (amountMatch.Success)
             {
                 amount = amountMatch.Groups[1].Value; // Captures "12,345.00"
             }
+            #endregion
 
             // 2. REASON EXTRACTION (The Confident Greedy Fix)
             // Changing +? to + forces it to grab the whole phrase on that line.
             // The lookahead ensures that if "Referencia" is present, it stops right before it.
-            #region Vendor
+            #region Reason
             Match reasonMatch = Regex.Match(rawPdfText, @"(?:Motivo|Concepto)\s+de\s+pago:\s*([^\r\n]+)", RegexOptions.IgnoreCase);
 
             if (reasonMatch.Success)
@@ -454,10 +470,12 @@ namespace FileRenamer
                 // Step 3: Run it through the healer to fix spacing or layout bugs
                 reason = CleanseAndHealText(cleanReason);
             }
+            #endregion
 
             // 3. VENDOR NAME EXTRACTION (Tuned with STOP boundary and fallback)
             // Captures everything after the label but STOPS looking if it hits numbers, colons, or "Dato no verificado"
-            string structuralPattern = @"Titular\s+de\s+la\s+cuenta:.*?Titular\s+de\s+la\s+cuenta:\s*([^\r\n:]+)";
+            #region Vendor
+            string structuralPattern = @"(?:Titular\s+de\s+la\s+cuenta|Nombre\s+del\s+beneficiario):.*?(?:Titular\s+de\s+la\s+cuenta|Nombre\s+del\s:beneficiario):\s*([^\r\n:]+)";
 
             Match structuralMatch = Regex.Match(rawPdfText, structuralPattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
@@ -481,7 +499,7 @@ namespace FileRenamer
             else
             {
                 // Fallback: Single match structural processing
-                string fallbackPattern = @"Titular\s+de\s+la\s+cuenta:\s*([^\r\n:]+)";
+                string fallbackPattern = @"(?:Titular\s+de\s+la\s+cuenta|Nombre\s+del\s+beneficiario):\s*([^\r\n:]+)";
                 Match fallbackMatch = Regex.Match(rawPdfText, fallbackPattern, RegexOptions.IgnoreCase);
 
                 if (fallbackMatch.Success)
@@ -504,7 +522,7 @@ namespace FileRenamer
             // --- 4. CURRENCY EXTRACTION (The Grand Finale) ---
             // Structural Sweep: Skip the 1st "Divisa", capture everything on the line of the 2nd "Divisa"
             #region Currency
-            string currencyPattern = @"Divisa\s+de\s+la\s+cuenta:.*?Divisa\s+de\s+la\s+cuenta:\s*([^\r\n:]+)";
+            string currencyPattern = @"(?:Divisa\s+de\s+la\s+cuenta|Moneda):.*?(?:Divisa\s+de\s+la\s+cuenta|Moneda):\s*([^\r\n:]+)";
             Match currencyMatch = Regex.Match(rawPdfText, currencyPattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
             if (currencyMatch.Success)
@@ -520,7 +538,7 @@ namespace FileRenamer
             else
             {
                 // Fallback: If a PDF layout only has one single Currency label on the whole page
-                Match singleCurrencyMatch = Regex.Match(rawPdfText, @"Divisa\s+de\s+la\s+cuenta:\s*([^\r\n:]+)", RegexOptions.IgnoreCase);
+                Match singleCurrencyMatch = Regex.Match(rawPdfText, @"(?:Divisa\s+de\s+la\s+cuenta|Moneda):\s*([^\r\n:]+)", RegexOptions.IgnoreCase);
                 if (singleCurrencyMatch.Success)
                 {
                     string singleCurrency = Regex.Split(singleCurrencyMatch.Groups[1].Value, @"(?:Importe|Titular|RFC|Banco|Motivo|$)", RegexOptions.IgnoreCase)[0];
@@ -602,6 +620,24 @@ namespace FileRenamer
                     ChkDarkMode.Checked = false;
                 }
             }
+        }
+
+        /// <summary>
+        /// Bypasses Owner Password restrictions by drawing page contents onto a fresh canvas.
+        /// </summary>
+        private static void SliceSecuredPage(PdfDocument sourceDoc, PdfDocument targetDoc, int pageNumber)
+        {
+            PdfPage sourcePage = sourceDoc.GetPage(pageNumber);
+
+            // Match dimensions perfectly
+            var pageRectangle = sourcePage.GetPageSize();
+            var targetPageSize = new iText.Kernel.Geom.PageSize(pageRectangle);
+            PdfPage newPage = targetDoc.AddNewPage(targetPageSize);
+
+            // Turn the page content into a vector form object and draw it
+            var pageForm = sourcePage.CopyAsFormXObject(targetDoc);
+            PdfCanvas canvas = new(newPage);
+            canvas.AddXObjectAt(pageForm, 0, 0);
         }
         #endregion
     }
