@@ -1,3 +1,5 @@
+using ClientUtils.Core.Contracts;
+using ClienUtils.Infrastructure.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FileRenamer
@@ -15,7 +17,7 @@ namespace FileRenamer
             var serviceCollection = new ServiceCollection();
             ConfigureServices(serviceCollection);
 
-           var serviceProvider = serviceCollection.BuildServiceProvider();
+            var serviceProvider = serviceCollection.BuildServiceProvider();
 
             // 2. Start the app by requesting the Main Form from the container
             var mainForm = serviceProvider.GetRequiredService<FileRenamerForm>();
@@ -28,6 +30,7 @@ namespace FileRenamer
             services.AddTransient<FileRenamerForm>();
             services.AddTransient<ProgressForm>();
             services.AddSingleton<Func<ProgressForm>>(x => () => x.GetRequiredService<ProgressForm>());
+            services.AddTransient<IPdfProcessor, TextPdfProcessor>();
         }
     }
 }

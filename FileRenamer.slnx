@@ -1,3 +1,5 @@
 <Solution>
+  <Project Path="ClientUtils.Core/ClientUtils.Core.csproj" Id="11c2d7ed-8dbf-4d48-bbef-a08d4a2c3103" />
+  <Project Path="ClienUtils.Infrastructure/ClienUtils.Infrastructure.csproj" Id="00791a51-4dfd-443f-afbb-70413dd28339" />
   <Project Path="FileRenamer/FileRenamer.App.csproj" />
 </Solution>

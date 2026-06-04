@@ -2,6 +2,8 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using ClientUtils.Core.Contracts;
+using ClientUtils.Core.Models;
 using iText.Forms;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas;
@@ -20,13 +22,15 @@ namespace FileRenamer
 #pragma warning restore SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time 
         private ProgressForm loadingScreen;
         private readonly Func<ProgressForm> _progressFormFactory;
+        private readonly IPdfProcessor pdfProcessor;
         #endregion
 
         #region Constructor
-        public FileRenamerForm(Func<ProgressForm> progressFormFactory)
+        public FileRenamerForm(Func<ProgressForm> progressFormFactory, IPdfProcessor pdfProcessor)
         {
             InitializeComponent();
             _progressFormFactory = progressFormFactory;
+            this.pdfProcessor = pdfProcessor;
         }
         #endregion
 
@@ -118,162 +122,41 @@ namespace FileRenamer
             ShowProgress();
 
             loadingScreen?.Refresh();
-
-            int currentFileIndex = 0;
-            int internalPageTracker = 1;
-            int successfullyProcessed = 0;
-            int currentRowIndex = 0;
-
-            List<string> filesToDelete = [];
-            var consecutiveNumber = 0;
-            if (TxtConsecutive.Text != string.Empty)
-            {
-                consecutiveNumber = int.Parse(TxtConsecutive.Text);
-            }
-            var useConsecutive = CmbCompany.SelectedItem.ToString() == "EMKA";
-
-            foreach (DataGridViewRow row in DgvPayments.Rows)
-            {
-                if (loadingScreen != null && loadingScreen.Controls["lblStatus"] != null)
+            var paymentRows = DgvPayments.Rows.Cast<DataGridViewRow>()
+                .Where(r => !r.IsNewRow)
+                .Select(r => new PaymentRowData
                 {
-                    int totalRows = DgvPayments.Rows.Cast<DataGridViewRow>().Count(r => !r.IsNewRow);
-                    var rowProcessed = currentRowIndex == totalRows ? totalRows : currentRowIndex + 1;
-                    loadingScreen.Controls["lblStatus"].Text = $"Procesando fila {rowProcessed} de {totalRows}...";
-                    loadingScreen.Refresh();
-                }
-                if (row.IsNewRow) continue;
+                    Date = r.Cells[0].Value?.ToString(),
+                    Vendor = r.Cells[2].Value?.ToString(),
+                    Concept = r.Cells[3].Value?.ToString(),
+                    Amount = r.Cells[4].FormattedValue?.ToString(),
+                    Currency = r.Cells[5].Value?.ToString()
+                })
+                .ToList();
 
-                if (useConsecutive)
+            int totalRows = paymentRows.Count;
+            int startConsecutive = string.IsNullOrEmpty(TxtConsecutive.Text) ? 0 : int.Parse(TxtConsecutive.Text);
+
+            pdfProcessor.ProcessPaymentBatch(files, paymentRows, CmbCompany.SelectedItem.ToString(), startConsecutive,
+                (currentRowIndex, currentFileName) =>
                 {
-                    consecutiveNumber = row.Index == 0 ? consecutiveNumber : consecutiveNumber + 1;
-                }
-
-                if (currentFileIndex >= files.Length)
-                {
-                    MessageBox.Show("Advertencia: La cantidad de filas es mayor a la cantidad de archivos originales.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    break;
-                }
-
-                string currentFilePath = files[currentFileIndex];
-
-                var datePart = row.Cells[0].Value?.ToString();
-                var vendorPart = row.Cells[2].Value?.ToString();
-                var conceptPart = row.Cells[3].Value?.ToString();
-                var amountPart = row.Cells[4].FormattedValue?.ToString();
-                var currencyPart = row.Cells[5].Value?.ToString();
-
-                vendorPart = string.Join("_", (vendorPart ?? "UNKNOWN").Split(Path.GetInvalidFileNameChars())).Trim();
-                conceptPart = string.Join("_", (conceptPart ?? "CONCEPT").Split(Path.GetInvalidFileNameChars())).Trim();
-                amountPart = string.Join("_", (amountPart ?? "0.00").Split(Path.GetInvalidFileNameChars())).Trim();
-                currencyPart = string.Join("_", (currencyPart ?? "MXN").Split(Path.GetInvalidFileNameChars())).Trim();
-
-                string directory = Path.GetDirectoryName(currentFilePath);
-                var newFileName = string.Empty;
-                var consecutivePart = useConsecutive ? $"{consecutiveNumber}-" : "";
-
-                newFileName = $"{datePart}-{CmbCompany.SelectedItem}-{consecutivePart}{vendorPart} {conceptPart}-{amountPart} {currencyPart}.pdf";
-
-                var destinationPath = Path.Combine(directory, newFileName);
-
-                var sliceSuccess = false;
-                var totalPagesInFile = 0;
-
-                try
-                {
-                    ReaderProperties readerProperties = new();
-                    readerProperties.SetPassword(Encoding.UTF8.GetBytes(""));
-
-                    using (PdfReader reader = new(currentFilePath, readerProperties))
-                    using (PdfDocument sourcePdfDoc = new(reader))
+                    // This code runs INSIDE the loop of the service, but executes on the Form!
+                    if (loadingScreen != null && loadingScreen.Controls["lblStatus"] != null)
                     {
-                        totalPagesInFile = sourcePdfDoc.GetNumberOfPages();
-
-                        using (PdfWriter writer = new(destinationPath))
-                        using (PdfDocument newSinglePagePdf = new(writer))
-                        {
-                            if (CmbCompany.SelectedItem.ToString() == "EMKA")
-                            {
-                                SliceSecuredPage(sourcePdfDoc, newSinglePagePdf, internalPageTracker);
-                            }
-                            else
-                            {
-                                // Original high-performance path for standard files
-                                sourcePdfDoc.CopyPagesTo(internalPageTracker, internalPageTracker, newSinglePagePdf);
-                            }
-                        }
-
-                        if (totalPagesInFile == 1)
-                        {
-                            if (!filesToDelete.Contains(currentFilePath))
-                            {
-                                filesToDelete.Add(currentFilePath);
-                            }
-                        }
+                        int humanRowIndex = currentRowIndex == totalRows ? totalRows : currentRowIndex + 1;
+                        loadingScreen.Controls["lblStatus"].Text = $"Procesando fila {humanRowIndex} de {totalRows}: {currentFileName}...";
+                        loadingScreen.Refresh();
                     }
-                    sliceSuccess = true;
-                    successfullyProcessed++;
-                }
-                catch (Exception ex)
-                {
-                    loadingScreen.Close();
-                    MessageBox.Show($"Failed to split file {Path.GetFileName(currentFilePath)} on row {successfullyProcessed + 1}: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
 
-                if (sliceSuccess)
-                {
-                    if (internalPageTracker < totalPagesInFile)
-                    {
-                        internalPageTracker++;
-                    }
-                    else
-                    {
-                        internalPageTracker = 1;
-                        currentFileIndex++;
-                    }
-                }
-
-                currentRowIndex++;
-                Application.DoEvents();
-                Thread.Sleep(150);
-            }
-
-            int deletedCount = 0;
-            foreach (string oldFilePath in filesToDelete)
-            {
-                try
-                {
-                    if (File.Exists(oldFilePath))
-                    {
-                        File.Delete(oldFilePath);
-                        deletedCount++;
-                    }
-                }
-                catch { /* Catch temporary OS locks silently */ }
-            }
+                    // Keep the UI thread breathing and layout moving smoothly
+                    Application.DoEvents();
+                    Thread.Sleep(150);
+                });
             Thread.Sleep(300);
             loadingScreen.Close();
-
-            string message = $"Proceso Completado.\nSe crearon {successfullyProcessed} archivos renombrados.";
-            if (deletedCount > 0)
-            {
-                message += $"\nSe eliminaron {deletedCount} archivos fuente pre-segmentados (los multipágina se conservaron).";
-            }
-
-            try
-            {
-                if (Directory.Exists(backupFolder))
-                {
-                    Directory.Delete(backupFolder, true);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Nota: El proceso terminó con éxito, pero no se pudo eliminar la carpeta temporal de respaldo: {ex.Message}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-
-            MessageBox.Show(message, "Exito!", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            OpenFolder();
+            DeleteBackUp(backupFolder);
+            MessageBox.Show("Proceso Completado con Éxito!", "Exito!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            OpenResultsFolder();
         }
 
         private void BtnFileDialog_Click(object sender, EventArgs e)
@@ -605,24 +488,6 @@ namespace FileRenamer
             }
         }
 
-        /// <summary>
-        /// Bypasses Owner Password restrictions by drawing page contents onto a fresh canvas.
-        /// </summary>
-        private static void SliceSecuredPage(PdfDocument sourceDoc, PdfDocument targetDoc, int pageNumber)
-        {
-            PdfPage sourcePage = sourceDoc.GetPage(pageNumber);
-
-            // Match dimensions perfectly
-            var pageRectangle = sourcePage.GetPageSize();
-            var targetPageSize = new iText.Kernel.Geom.PageSize(pageRectangle);
-            PdfPage newPage = targetDoc.AddNewPage(targetPageSize);
-
-            // Turn the page content into a vector form object and draw it
-            var pageForm = sourcePage.CopyAsFormXObject(targetDoc);
-            PdfCanvas canvas = new(newPage);
-            canvas.AddXObjectAt(pageForm, 0, 0);
-        }
-
         private void ShowProgress()
         {
             loadingScreen = _progressFormFactory();
@@ -636,7 +501,7 @@ namespace FileRenamer
             loadingScreen.Show(this);
         }
 
-        private void OpenFolder()
+        private void OpenResultsFolder()
         {
             try
             {
@@ -649,6 +514,21 @@ namespace FileRenamer
             catch (Exception ex)
             {
                 MessageBox.Show($"No se pudo abrir la carpeta: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private static void DeleteBackUp(string backupFolder)
+        {
+            try
+            {
+                if (Directory.Exists(backupFolder))
+                {
+                    Directory.Delete(backupFolder, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Nota: El proceso terminó con éxito, pero no se pudo eliminar la carpeta temporal de respaldo: {ex.Message}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
         #endregion
