@@ -16,7 +16,6 @@ namespace ClienUtils.Infrastructure.Services
                 string fileNameOnly = Path.GetFileName(filePath);
                 int fileHumanIndex = i + 1;
 
-                // 📢 Report file progress back to the UI
                 onProgress?.Invoke($"Procesando Archivo {fileHumanIndex} de {files.Length}: {fileNameOnly}...");
 
                 try
@@ -147,6 +146,7 @@ namespace ClienUtils.Infrastructure.Services
                     @"|\bMEXICOS\s*DERL\b" +                 // Explicitly targets your exact problem string
                     @"|\bS\s*DE?\s*R?L?\s*DE?\s*C?V?\b" +    // Dynamic catcher for S DE RL DE CV fragments
                     @"|\bSA\s*DE\s*C?V?\b" +                 // Dynamic catcher for SA DE CV fragments
+                    @"|\bSAPI\s*DE\s*C?V?\b" +               // Dynamic catcher for SAPI DE CV fragments
                     @"|\bS\s*DE?R?L?\b" +                    // Catches "S DERL" or "S DE RL"
                     @"|\bSC\b)",                             // Isolated SC boundary
                     RegexOptions.IgnoreCase)[0];
@@ -167,6 +167,7 @@ namespace ClienUtils.Infrastructure.Services
                         @"|\bMEXICOS\s*DERL\b" +
                         @"|\bS\s*DE?\s*R?L?\s*DE?\s*C?V?\b" +
                         @"|\bSA\s*DE\s*C?V?\b" +
+                        @"|\bSAPI\s*DE\s*C?V?\b" +
                         @"|\bS\s*DE?R?L?\b" +
                         @"|\bSC\b)",
                         RegexOptions.IgnoreCase)[0];
