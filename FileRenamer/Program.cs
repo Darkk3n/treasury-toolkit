@@ -31,6 +31,7 @@ namespace FileRenamer
             services.AddTransient<ProgressForm>();
             services.AddSingleton<Func<ProgressForm>>(x => () => x.GetRequiredService<ProgressForm>());
             services.AddTransient<IPdfProcessor, TextPdfProcessor>();
+            services.AddTransient<IFileScanner, LocalFileScanner>();
         }
     }
 }
