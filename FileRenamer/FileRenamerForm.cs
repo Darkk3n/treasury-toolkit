@@ -18,12 +18,15 @@ namespace FileRenamer
 #pragma warning disable SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
         private static extern int StrCmpLogicalW(string psz1, string psz2);
 #pragma warning restore SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time 
+        private ProgressForm loadingScreen;
+        private readonly Func<ProgressForm> _progressFormFactory;
         #endregion
 
         #region Constructor
-        public FileRenamerForm()
+        public FileRenamerForm(Func<ProgressForm> progressFormFactory)
         {
             InitializeComponent();
+            _progressFormFactory = progressFormFactory;
         }
         #endregion
 
@@ -112,15 +115,7 @@ namespace FileRenamer
             var files = Directory.GetFiles(LblFolder.Text, "*.pdf").ToArray();
             Array.Sort(files, (x, y) => StrCmpLogicalW(x, y)); // Enforces 1, 2, 3, 10 order
 
-            ProgressForm loadingScreen = new()
-            {
-                StartPosition = FormStartPosition.Manual
-            };
-            int centerX = this.Location.X + (this.Width - loadingScreen.Width) / 2;
-            int centerY = this.Location.Y + (this.Height - loadingScreen.Height) / 2;
-            loadingScreen.Location = new Point(centerX, centerY);
-            loadingScreen.Show(this);
-
+            ShowProgress();
             int currentFileIndex = 0;
             int internalPageTracker = 1;
             int successfullyProcessed = 0;
@@ -246,7 +241,6 @@ namespace FileRenamer
             }
 
             loadingScreen.Close();
-            loadingScreen.Dispose();
 
             string message = $"Proceso Completado.\nSe crearon {successfullyProcessed} archivos renombrados.";
             if (deletedCount > 0)
@@ -298,14 +292,7 @@ namespace FileRenamer
             var files = Directory.GetFiles(sourceDirectory, "*.pdf", System.IO.SearchOption.TopDirectoryOnly).ToList();
             files.Sort((x, y) => StrCmpLogicalW(x, y));
 
-            ProgressForm loadingScreen = new();
-            loadingScreen.StartPosition = FormStartPosition.Manual;
-            int centerX = this.Location.X + (this.Width - loadingScreen.Width) / 2;
-            int centerY = this.Location.Y + (this.Height - loadingScreen.Height) / 2;
-
-            loadingScreen.Location = new Point(centerX, centerY);
-
-            loadingScreen.Show(this);
+            ShowProgress();
 
             int fileCounter = 1;
 
@@ -350,7 +337,6 @@ namespace FileRenamer
             }
             DgvPayments.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
             loadingScreen.Close();
-            loadingScreen.Dispose();
             MessageBox.Show($"Se escanearon y cargaron {files.Count} archivos en la tabla!", "Escaneo Completado", MessageBoxButtons.OK, MessageBoxIcon.Information);
             //TODO: Revert this line
             //LblFolder.Text = folderDialog.SelectedPath;
@@ -638,6 +624,19 @@ namespace FileRenamer
             var pageForm = sourcePage.CopyAsFormXObject(targetDoc);
             PdfCanvas canvas = new(newPage);
             canvas.AddXObjectAt(pageForm, 0, 0);
+        }
+
+        private void ShowProgress()
+        {
+            loadingScreen = _progressFormFactory();
+            loadingScreen.StartPosition = FormStartPosition.Manual;
+
+            // Center it relative to the current form position
+            int centerX = this.Location.X + (this.Width - loadingScreen.Width) / 2;
+            int centerY = this.Location.Y + (this.Height - loadingScreen.Height) / 2;
+            loadingScreen.Location = new Point(centerX, centerY);
+
+            loadingScreen.Show(this);
         }
         #endregion
     }

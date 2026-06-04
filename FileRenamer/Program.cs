@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+
 namespace FileRenamer
 {
     internal static class Program
@@ -8,10 +10,24 @@ namespace FileRenamer
         [STAThread]
         static void Main()
         {
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
-            Application.Run(new FileRenamerForm());
+
+            var serviceCollection = new ServiceCollection();
+            ConfigureServices(serviceCollection);
+
+           var serviceProvider = serviceCollection.BuildServiceProvider();
+
+            // 2. Start the app by requesting the Main Form from the container
+            var mainForm = serviceProvider.GetRequiredService<FileRenamerForm>();
+
+            Application.Run(mainForm);
+        }
+
+        private static void ConfigureServices(IServiceCollection services)
+        {
+            services.AddTransient<FileRenamerForm>();
+            services.AddTransient<ProgressForm>();
+            services.AddSingleton<Func<ProgressForm>>(x => () => x.GetRequiredService<ProgressForm>());
         }
     }
 }
