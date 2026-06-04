@@ -116,6 +116,9 @@ namespace FileRenamer
             Array.Sort(files, (x, y) => StrCmpLogicalW(x, y)); // Enforces 1, 2, 3, 10 order
 
             ShowProgress();
+
+            loadingScreen?.Refresh();
+
             int currentFileIndex = 0;
             int internalPageTracker = 1;
             int successfullyProcessed = 0;
@@ -128,8 +131,16 @@ namespace FileRenamer
                 consecutiveNumber = int.Parse(TxtConsecutive.Text);
             }
             var useConsecutive = CmbCompany.SelectedItem.ToString() == "EMKA";
+
             foreach (DataGridViewRow row in DgvPayments.Rows)
             {
+                if (loadingScreen != null && loadingScreen.Controls["lblStatus"] != null)
+                {
+                    int totalRows = DgvPayments.Rows.Cast<DataGridViewRow>().Count(r => !r.IsNewRow);
+                    var rowProcessed = currentRowIndex == totalRows ? totalRows : currentRowIndex + 1;
+                    loadingScreen.Controls["lblStatus"].Text = $"Procesando fila {rowProcessed} de {totalRows}...";
+                    loadingScreen.Refresh();
+                }
                 if (row.IsNewRow) continue;
 
                 if (useConsecutive)
@@ -224,6 +235,7 @@ namespace FileRenamer
 
                 currentRowIndex++;
                 Application.DoEvents();
+                Thread.Sleep(150);
             }
 
             int deletedCount = 0;
@@ -239,7 +251,7 @@ namespace FileRenamer
                 }
                 catch { /* Catch temporary OS locks silently */ }
             }
-
+            Thread.Sleep(300);
             loadingScreen.Close();
 
             string message = $"Proceso Completado.\nSe crearon {successfullyProcessed} archivos renombrados.";
@@ -261,18 +273,7 @@ namespace FileRenamer
             }
 
             MessageBox.Show(message, "Exito!", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            try
-            {
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = $"\"{LblFolder.Text}\"",
-                    UseShellExecute = true
-                });
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"No se pudo abrir la carpeta: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            OpenFolder();
         }
 
         private void BtnFileDialog_Click(object sender, EventArgs e)
@@ -282,12 +283,16 @@ namespace FileRenamer
             folderDialog.UseDescriptionForTitle = true;
             folderDialog.ShowNewFolderButton = false; // Prevents them making a mess
 
-            //TODO: Revert this
-            //if (folderDialog.ShowDialog() == DialogResult.OK)
+            //TODO: Uncomment this
+            //if (folderDialog.ShowDialog() == DialogResult.Cancel)
             //{
+            //    return;
+            //}
             string extractedDate = DgvPayments.Rows[0].Cells[0].Value.ToString();
 
             DgvPayments.Rows.Clear();
+            //TODO: Revert this hardcoded path
+            //var sourceDirectory = folderDialog.SelectedPath;
             var sourceDirectory = @"C:\Users\455198\Downloads\Renombrar";
             var files = Directory.GetFiles(sourceDirectory, "*.pdf", System.IO.SearchOption.TopDirectoryOnly).ToList();
             files.Sort((x, y) => StrCmpLogicalW(x, y));
@@ -319,14 +324,9 @@ namespace FileRenamer
 
                         if (string.IsNullOrWhiteSpace(pageText)) continue;
 
-
                         ExtractPdfDataPoints(pageText, out string extractedAmount, out string extractedVendorName, out string extractedReason, out string extractedCurrency);
 
-
-                        string gridFileName = totalPages > 1 ? $"{Path.GetFileNameWithoutExtension(fileNameOnly)}_Pg{pageNum}.pdf" : fileNameOnly;
-
                         DgvPayments.Rows.Add(extractedDate, fileNameOnly, extractedVendorName, extractedReason, extractedAmount, extractedCurrency);
-
                     }
                 }
                 catch (Exception ex)
@@ -338,10 +338,7 @@ namespace FileRenamer
             DgvPayments.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
             loadingScreen.Close();
             MessageBox.Show($"Se escanearon y cargaron {files.Count} archivos en la tabla!", "Escaneo Completado", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            //TODO: Revert this line
-            //LblFolder.Text = folderDialog.SelectedPath;
             LblFolder.Text = sourceDirectory;
-            //}
         }
 
         private void ChkDarkMode_CheckedChanged(object sender, EventArgs e)
@@ -637,6 +634,22 @@ namespace FileRenamer
             loadingScreen.Location = new Point(centerX, centerY);
 
             loadingScreen.Show(this);
+        }
+
+        private void OpenFolder()
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = $"\"{LblFolder.Text}\"",
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"No se pudo abrir la carpeta: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
         #endregion
     }
