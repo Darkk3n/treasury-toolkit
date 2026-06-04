@@ -94,19 +94,9 @@ namespace FileRenamer
 
         private void BtnStart_Click(object sender, EventArgs e)
         {
-            if (CmbCompany.SelectedIndex == 0)
+            bool isValid = ValidateStartProcess();
+            if (!isValid)
             {
-                MessageBox.Show("Seleccione una empresa para continuar", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            if (LblFolder.Text == "..." || !Directory.Exists(LblFolder.Text))
-            {
-                MessageBox.Show("Seleccione una carpeta para continuar", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            if (CmbCompany.SelectedItem.ToString() == "EMKA" && string.IsNullOrEmpty(TxtConsecutive.Text))
-            {
-                MessageBox.Show("Ingrese un número consecutivo.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -187,14 +177,14 @@ namespace FileRenamer
             fileScanner.ScanPdfFiles(extractedDate, [.. files],
                 onProgress: (statusMessage) =>
                 {
-                     if (loadingScreen != null && loadingScreen.Controls["lblStatus"] != null)
-                     {
-                         loadingScreen.Controls["lblStatus"].Text = statusMessage;
-                         loadingScreen.Refresh();
-                     }
-                     Application.DoEvents();
-                     Thread.Sleep(50); // Small visual breather so they can read layout changes
-                 },
+                    if (loadingScreen != null && loadingScreen.Controls["lblStatus"] != null)
+                    {
+                        loadingScreen.Controls["lblStatus"].Text = statusMessage;
+                        loadingScreen.Refresh();
+                    }
+                    Application.DoEvents();
+                    Thread.Sleep(50); // Small visual breather so they can read layout changes
+                },
                  onRowExtracted: (dataPayload) =>
                  {
                      DgvPayments.Rows.Add(dataPayload.Date, dataPayload.FileName, dataPayload.Vendor, dataPayload.Concept, dataPayload.Amount, dataPayload.Currency);
@@ -204,7 +194,17 @@ namespace FileRenamer
 
             DgvPayments.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
             loadingScreen.Close();
-            MessageBox.Show($"Se escanearon y cargaron {files.Count} archivos en la tabla!", "Escaneo Completado", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            var message = string.Empty;
+            if (files.Count == 0)
+            {
+                message = "No se encontraron archivos para escanear";
+                DgvPayments.Rows.Add(extractedDate, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+            }
+            else
+            {
+                message = $"Se escanearon y cargaron {files.Count} archivos en la tabla";
+            }
+            MessageBox.Show(message, "Escaneo Completado", MessageBoxButtons.OK, MessageBoxIcon.Information);
             LblFolder.Text = sourceDirectory;
         }
 
@@ -378,6 +378,27 @@ namespace FileRenamer
             {
                 MessageBox.Show($"Nota: El proceso terminó con éxito, pero no se pudo eliminar la carpeta temporal de respaldo: {ex.Message}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+        }
+
+        private bool ValidateStartProcess()
+        {
+            if (CmbCompany.SelectedIndex == 0)
+            {
+                MessageBox.Show("Seleccione una empresa para continuar", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            if (LblFolder.Text == "..." || !Directory.Exists(LblFolder.Text))
+            {
+                MessageBox.Show("Seleccione una carpeta para continuar", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            if (CmbCompany.SelectedItem.ToString() == "EMKA" && string.IsNullOrEmpty(TxtConsecutive.Text))
+            {
+                MessageBox.Show("Ingrese un número consecutivo.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            return true;
         }
         #endregion
     }
