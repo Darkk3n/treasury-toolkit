@@ -170,6 +170,13 @@ namespace FileRenamer
             //var sourceDirectory = folderDialog.SelectedPath;
             var sourceDirectory = @"C:\Users\455198\Downloads\Renombrar";
             var files = Directory.GetFiles(sourceDirectory, "*.pdf", System.IO.SearchOption.TopDirectoryOnly).ToList();
+
+            if (files.Count == 0)
+            {
+                DgvPayments.Rows.Add(DateTime.Now.ToString("yyyyMMdd"), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+                MessageBox.Show("No se encontraron archivos para escanear.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             files.Sort((x, y) => StrCmpLogicalW(x, y));
 
             ShowProgress();
@@ -194,12 +201,7 @@ namespace FileRenamer
 
             DgvPayments.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
             loadingScreen.Close();
-            var message = files.Count == 0 ? "No se encontraron archivos para escanear." : $"Se escanearon y cargaron {files.Count}(s) archivo(s) en la tabla.";
-            if (files.Count == 0)
-            {
-                DgvPayments.Rows.Add(extractedDate, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
-            }
-            MessageBox.Show(message, "Escaneo Completado", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show($"Se escanearon y cargaron {files.Count}(s) archivo(s) en la tabla.", "Escaneo Completado", MessageBoxButtons.OK, MessageBoxIcon.Information);
             LblFolder.Text = sourceDirectory;
         }
 
