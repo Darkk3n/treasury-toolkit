@@ -168,7 +168,7 @@ namespace FileRenamer
             DgvPayments.Rows.Clear();
             //TODO: Revert this hardcoded path
             //var sourceDirectory = folderDialog.SelectedPath;
-            var sourceDirectory = @"C:\Users\455198\Downloads\Renombrar";
+            var sourceDirectory = @"C:\Renombrar";
             var files = Directory.GetFiles(sourceDirectory, "*.pdf", System.IO.SearchOption.TopDirectoryOnly).ToList();
 
             if (files.Count == 0)
