@@ -240,6 +240,10 @@ namespace FileRenamer
             DgvPayments.Rows.Clear();
             DgvPayments.Rows.Add(formattedDate);
             DgvPayments.Columns[2].DefaultCellStyle.Format = "N2";
+            foreach (DataGridViewColumn column in DgvPayments.Columns)
+            {
+                column.SortMode = DataGridViewColumnSortMode.NotSortable;
+            }
         }
 
         private static string BackupSourceFiles(string sourceFolder)
