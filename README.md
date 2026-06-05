@@ -19,7 +19,7 @@ How it works (usage summary)
 1. Launch the application.
 2. Add files or select a folder to populate the file list (UI).
 3. Enter a rename pattern using tokens (examples below).
-4. Use the Preview feature to verify results.
+4. Use the Preview Data Grid feature to verify results.
 5. Apply the rename operation when satisfied.
 
 Common tokens
