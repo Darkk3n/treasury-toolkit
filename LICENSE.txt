@@ -1,0 +1,12 @@
+Copyright © 2026 Darkk3nMx. All rights reserved.
+
+All source code, software binaries, assets, and documentation contained in this 
+repository are the sole intellectual property of the author. 
+
+No implementation rights, usage rights, or distribution rights are granted to 
+any party at this time. Unauthorized copying, modification, decompilation, 
+distribution, or resale of this material is strictly prohibited.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES, 
+OR OTHER LIABILITY.
