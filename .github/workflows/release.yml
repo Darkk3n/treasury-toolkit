@@ -30,7 +30,7 @@ jobs:
     # Point this to the path of your main WinForms .csproj file
     - name: Compile Single Executable Suite
       run: |
-        dotnet publish FileRenamer.App/FileRenamer.App.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true -o ./publish
+        dotnet publish FileRenamer/FileRenamer.App.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true -o ./publish
 
     # Step 5: Automatically create a GitHub Release and upload the solitary .exe file
     - name: Create GitHub Release
