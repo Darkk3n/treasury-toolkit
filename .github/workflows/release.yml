@@ -34,7 +34,7 @@ jobs:
 
     # Step 5: Automatically create a GitHub Release and upload the solitary .exe file
     - name: Create GitHub Release
-      uses: softprops/action-gh-releases@v2
+      uses: softprops/action-gh-release@v2
       with:
         files: ./publish/FileRenamer.App.exe
       env:
