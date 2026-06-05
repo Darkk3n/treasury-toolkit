@@ -1,4 +1,4 @@
-Copyright © 2026 Darkk3nMx. All rights reserved.
+Copyright © 2026 Gerardo Aguilar Robledo. All rights reserved.
 
 All source code, software binaries, assets, and documentation contained in this 
 repository are the sole intellectual property of the author. 
