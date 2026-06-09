@@ -1,10 +1,10 @@
 ﻿using System.Text.RegularExpressions;
-using ClientUtils.Core.Contracts;
-using ClientUtils.Core.Models;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
+using TreasuryToolkit.Core.Contracts;
+using TreasuryToolkit.Core.Models;
 
-namespace ClienUtils.Infrastructure.Services
+namespace TreasuryToolkit.Infra.Services
 {
     public class LocalFileScanner : IFileScanner
     {

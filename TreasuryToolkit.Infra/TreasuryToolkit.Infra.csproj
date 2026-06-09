@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ClientUtils.Core\ClientUtils.Core.csproj" />
+    <ProjectReference Include="..\TreasuryToolkit.Core\TreasuryToolkit.Core.csproj" />
   </ItemGroup>
 
 </Project>

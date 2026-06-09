@@ -1,6 +1,6 @@
-﻿using ClientUtils.Core.Models;
+﻿using TreasuryToolkit.Core.Models;
 
-namespace ClientUtils.Core.Contracts
+namespace TreasuryToolkit.Core.Contracts
 {
     public interface IPdfProcessor
     {

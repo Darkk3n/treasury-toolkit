@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ClientUtils.Core\ClientUtils.Core.csproj" />
-    <ProjectReference Include="..\ClienUtils.Infrastructure\ClienUtils.Infrastructure.csproj" />
+    <ProjectReference Include="..\TreasuryToolkit.Core\TreasuryToolkit.Core.csproj" />
+    <ProjectReference Include="..\TreasuryToolkit.Infra\TreasuryToolkit.Infra.csproj" />
   </ItemGroup>
 
   <ItemGroup>
