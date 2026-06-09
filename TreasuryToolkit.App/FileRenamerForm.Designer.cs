@@ -1,4 +1,4 @@
-﻿namespace FileRenamer
+﻿namespace TreasuryToolkit.App
 {
     partial class FileRenamerForm
     {

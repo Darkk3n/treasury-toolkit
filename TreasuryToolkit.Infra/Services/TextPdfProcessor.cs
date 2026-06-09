@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Reflection.PortableExecutable;
 using System.Text;
-using ClientUtils.Core.Contracts;
-using ClientUtils.Core.Models;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas;
+using TreasuryToolkit.Core.Contracts;
+using TreasuryToolkit.Core.Models;
 
-namespace ClienUtils.Infrastructure.Services
+namespace TreasuryToolkit.Infra.Services
 {
     public class TextPdfProcessor : IPdfProcessor
     {

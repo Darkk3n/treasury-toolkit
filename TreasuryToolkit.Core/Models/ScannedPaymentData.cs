@@ -1,4 +1,4 @@
-﻿namespace ClientUtils.Core.Models
+﻿namespace TreasuryToolkit.Core.Models
 {
     public class ScannedPaymentData : PaymentRowData
     {

@@ -1,8 +1,9 @@
-using ClientUtils.Core.Contracts;
-using ClienUtils.Infrastructure.Services;
+using FileRenamer;
 using Microsoft.Extensions.DependencyInjection;
+using TreasuryToolkit.Core.Contracts;
+using TreasuryToolkit.Infra.Services;
 
-namespace FileRenamer
+namespace TreasuryToolkit.App
 {
     internal static class Program
     {

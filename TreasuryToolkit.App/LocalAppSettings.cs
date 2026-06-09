@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FileRenamer
+namespace TreasuryToolkit.App
 {
     public class LocalAppSettings
     {

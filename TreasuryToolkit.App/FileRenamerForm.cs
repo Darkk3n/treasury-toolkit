@@ -1,15 +1,11 @@
 ﻿using System.Diagnostics;
-using System.Text;
 using System.Text.Json;
-using System.Text.RegularExpressions;
-using ClientUtils.Core.Contracts;
-using ClientUtils.Core.Models;
 using iText.Forms;
-using iText.Kernel.Pdf;
-using iText.Kernel.Pdf.Canvas;
 using Microsoft.VisualBasic.FileIO;
+using TreasuryToolkit.Core.Contracts;
+using TreasuryToolkit.Core.Models;
 
-namespace FileRenamer
+namespace TreasuryToolkit.App
 {
     public partial class FileRenamerForm : Form
     {
