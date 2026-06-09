@@ -1,9 +1,9 @@
-FileRenamer
+TreasuryToolkit
 ===========
 
 Overview
 --------
-FileRenamer is a small Windows desktop utility (WinForms) written for .NET 10 that helps with batch renaming files. It focuses on quick, predictable renaming with a preview step and simple token-based patterns so you can safely rename large numbers of files.
+TreasuryToolkit is a small Windows desktop utility (WinForms) written for .NET 10 that helps with batch renaming files. It focuses on quick, predictable renaming with a preview step and simple token-based patterns so you can safely rename large numbers of files.
 
 Key features
 ------------
