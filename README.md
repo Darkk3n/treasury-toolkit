@@ -1,43 +1,42 @@
-TreasuryToolkit
-===========
+# TreasuryToolkit
 
-Overview
---------
-TreasuryToolkit is a small Windows desktop utility (WinForms) written for .NET 10 that helps with batch renaming files. It focuses on quick, predictable renaming with a preview step and simple token-based patterns so you can safely rename large numbers of files.
+## Overview
+TreasuryToolkit is a high-performance Windows desktop utility suite built with **.NET 10** and **WinForms**. Originally designed to tackle high-speed batch file renaming with strict preview guardrails, it is engineered to serve as a centralized hub for automating tedious administrative workflows, file parsing, and data manipulation.
 
-Key features
-------------
-- Batch rename files and whole folders
-- Preview changes before applying them
-- Token-based name patterns (counters, original name, extension, date)
-- Filter by extension and simple search patterns
-- Undo the last rename operation
-- Lightweight single-window UI for fast workflows
+## Key Features
+* **Batch File Renaming:** Rename hundreds of files or entire directories instantly.
+* **Safe Preview Grid:** A dedicated data grid lets you preview exact structural changes before writing them to the disk.
+* **Token-Based Patterns:** Leverage dynamic tokens like `{name}`, `{ext}`, `{counter}`, and custom `{date:format}` configurations.
+* **Safety Net (Undo):** One-click undo action to instantly revert your last batch rename operation.
+* **High-Performance Architecture:** Compiled as a single, standalone, self-contained executable (`.exe`) with a zero-bundle footprint—no external framework installations required.
 
-How it works (usage summary)
----------------------------
-1. Launch the application.
-2. Add files or select a folder to populate the file list (UI).
-3. Enter a rename pattern using tokens (examples below).
-4. Use the Preview Data Grid feature to verify results.
-5. Apply the rename operation when satisfied.
+## Upcoming Modules 🚀
+* **Excel Automation Engine:** Loop-free, LINQ-powered spreadsheet manipulation utilizing `ClosedXML` to automate column filtering, row counting, and aggregate math workflows.
 
-Common tokens
--------------
-- {name} — original filename without extension
-- {ext} — file extension
-- {counter} — sequential number (configurable start and padding)
-- {date:format} — file timestamp formatted with .NET date format strings (e.g., {date:yyyyMMdd})
+## How It Works
+1. **Target:** Launch the application and select a workspace folder or drag-and-drop your target files.
+2. **Pattern:** Input your desired formatting schema using the token guide below.
+3. **Verify:** Check the Preview Data Grid to ensure token expansions map perfectly.
+4. **Execute:** Commit the change with absolute confidence.
 
-Dependencies
-------------
-- iText.Kernel for PDF parsing and page copying. Check the project file for the exact package/version.
+## Common Rename Tokens
+* `{name}` — Original filename excluding the extension.
+* `{ext}` — The file extension (e.g., `.pdf`, `.xlsx`).
+* `{counter}` — Sequential incrementor (supports custom padding, e.g., `001`, `002`).
+* `{date:format}` — Injects file timestamps using native .NET date strings (e.g., `{date:yyyy-MM-dd}`).
 
-Troubleshooting
----------------
-- If preview shows unexpected results, try a simpler pattern (e.g., {name}{ext}) and verify tokens are used correctly.
-- Check file permissions if rename operations fail on some files.
+## Core Dependencies
+* **iText.Kernel** — Advanced PDF binary parsing and page-copy architecture.
+* **ClosedXML** — (In Development) High-speed, fluid OpenXML Excel spreadsheet manipulation.
 
-Author
-------
-Created by the repository owner.
+## Troubleshooting
+* **Unexpected Previews:** Simplify your pattern expression back to basic tokens (e.g., `{name}_{counter}{ext}`) to isolate formatting anomalies.
+* **Failed Operations:** Ensure targeted files are closed in external applications (e.g., Excel or Acrobat) and that your user account has administrative read/write permissions for the target directory.
+
+## License & Intellectual Property
+Copyright © 2026 Darkk3n. All Rights Reserved.
+
+This software and its source code are strictly proprietary and confidential. Unauthorized copying, modification, distribution, or commercial reuse of this repository's assets via any medium is strictly prohibited. The source code is maintained publicly solely for architectural exhibition and portfolio validation.
+
+## Author
+Maintained and engineered by **Darkk3n**.
