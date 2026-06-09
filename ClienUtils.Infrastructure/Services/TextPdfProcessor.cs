@@ -31,10 +31,10 @@ namespace ClienUtils.Infrastructure.Services
                 if (useConsecutive && i > 0) consecutiveNumber++;
 
                 // Clean file string strings
-                var vendor = string.Join("_", (row.Vendor ?? "UNKNOWN").Split(Path.GetInvalidFileNameChars())).Trim();
-                var concept = string.Join("_", (row.Concept ?? "CONCEPT").Split(Path.GetInvalidFileNameChars())).Trim();
-                var amount = string.Join("_", (row.Amount ?? "0.00").Split(Path.GetInvalidFileNameChars())).Trim();
-                var currency = string.Join("_", (row.Currency ?? "MXN").Split(Path.GetInvalidFileNameChars())).Trim();
+                var vendor = string.Join("_", (row.Vendor ?? string.Empty).Split(Path.GetInvalidFileNameChars())).Trim();
+                var concept = string.Join("_", (row.Concept ?? string.Empty).Split(Path.GetInvalidFileNameChars())).Trim();
+                var amount = string.Join("_", (row.Amount ?? string.Empty).Split(Path.GetInvalidFileNameChars())).Trim();
+                var currency = string.Join("_", (row.Currency ?? string.Empty).Split(Path.GetInvalidFileNameChars())).Trim();
 
                 string directory = Path.GetDirectoryName(currentFilePath);
                 var consecutivePart = useConsecutive ? $"{consecutiveNumber}-" : "";
