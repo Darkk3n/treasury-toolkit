@@ -43,8 +43,6 @@ namespace TreasuryToolkit.Infra.Services
 
                 int totalPagesInFile = 0;
 
-                // ... Your exact iText 9 reader/writer/SliceSecuredPage logic remains here ...
-                // (Just use sourcePdfDoc and newSinglePagePdf processing)
                 ReaderProperties readerProperties = new();
                 readerProperties.SetPassword(Encoding.UTF8.GetBytes(""));
 
