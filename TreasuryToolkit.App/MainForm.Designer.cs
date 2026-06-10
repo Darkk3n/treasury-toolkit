@@ -86,6 +86,7 @@
             BtnExcelTool.TabIndex = 1;
             BtnExcelTool.Text = "Excel";
             BtnExcelTool.UseVisualStyleBackColor = true;
+            BtnExcelTool.Click += BtnExcelTool_Click;
             // 
             // BtnPdfTool
             // 
@@ -98,6 +99,7 @@
             BtnPdfTool.TabIndex = 0;
             BtnPdfTool.Text = "Renombrador de PDFs";
             BtnPdfTool.UseVisualStyleBackColor = true;
+            BtnPdfTool.Click += BtnPdfTool_Click;
             // 
             // PnlMainContent
             // 

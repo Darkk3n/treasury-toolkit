@@ -14,5 +14,10 @@ namespace TreasuryToolkit.App
         {
             InitializeComponent();
         }
+
+        public void ApplyTheme(bool isDarkMode)
+        {
+            this.BackColor = isDarkMode ? Color.FromArgb(30, 30, 30) : Color.FromKnownColor(KnownColor.ControlLightLight);
+        }
     }
 }
