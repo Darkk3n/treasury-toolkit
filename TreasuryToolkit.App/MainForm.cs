@@ -10,12 +10,15 @@ namespace TreasuryToolkit.App
         private UserControl _currentView;
         private UcFileRenamer _fileRenamer;
         private UcExcelWorkflowAutomator _excelWorkflowAutomator;
-        private readonly Func<ProgressForm> _progressFormFactory;
+        private readonly Func<ProgressForm> progressFormFactory;
         private readonly IPdfProcessor pdfProcessor;
         private readonly IFileScanner fileScanner;
 
-        public MainForm()
+        public MainForm(Func<ProgressForm> progressFormFactory, IPdfProcessor pdfProcessor, IFileScanner fileScanner)
         {
+            this.progressFormFactory = progressFormFactory;
+            this.pdfProcessor = pdfProcessor;
+            this.fileScanner = fileScanner;
             InitializeComponent();
             InitViews();
             LoadSettings();
@@ -92,7 +95,7 @@ namespace TreasuryToolkit.App
 
         private void InitViews()
         {
-            _fileRenamer = new UcFileRenamer(_progressFormFactory, pdfProcessor, fileScanner)
+            _fileRenamer = new UcFileRenamer(progressFormFactory, pdfProcessor, fileScanner)
             {
                 Dock = DockStyle.Fill
             };

@@ -1,4 +1,3 @@
-using FileRenamer;
 using Microsoft.Extensions.DependencyInjection;
 using TreasuryToolkit.Core.Contracts;
 using TreasuryToolkit.Infra.Services;
@@ -29,7 +28,8 @@ namespace TreasuryToolkit.App
         private static void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<UcFileRenamer>();
-            services.AddTransient<MainForm>();
+            services.AddTransient<UcExcelWorkflowAutomator>();
+            services.AddSingleton<MainForm>();
             services.AddTransient<ProgressForm>();
             services.AddSingleton<Func<ProgressForm>>(x => () => x.GetRequiredService<ProgressForm>());
             services.AddTransient<IPdfProcessor, TextPdfProcessor>();
