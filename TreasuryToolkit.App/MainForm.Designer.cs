@@ -54,10 +54,11 @@
             // 
             ChkGlobalTheme.AutoSize = true;
             ChkGlobalTheme.Dock = DockStyle.Bottom;
-            ChkGlobalTheme.Location = new Point(0, 584);
+            ChkGlobalTheme.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            ChkGlobalTheme.Location = new Point(0, 578);
             ChkGlobalTheme.Name = "ChkGlobalTheme";
-            ChkGlobalTheme.Padding = new Padding(50, 0, 0, 0);
-            ChkGlobalTheme.Size = new Size(200, 19);
+            ChkGlobalTheme.Padding = new Padding(40, 0, 0, 0);
+            ChkGlobalTheme.Size = new Size(200, 25);
             ChkGlobalTheme.TabIndex = 3;
             ChkGlobalTheme.Text = "Modo Oscuro";
             ChkGlobalTheme.UseVisualStyleBackColor = true;
@@ -68,9 +69,10 @@
             BtnAbout.Dock = DockStyle.Top;
             BtnAbout.FlatAppearance.BorderSize = 0;
             BtnAbout.FlatStyle = FlatStyle.Flat;
-            BtnAbout.Location = new Point(0, 52);
+            BtnAbout.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            BtnAbout.Location = new Point(0, 64);
             BtnAbout.Name = "BtnAbout";
-            BtnAbout.Size = new Size(200, 23);
+            BtnAbout.Size = new Size(200, 31);
             BtnAbout.TabIndex = 2;
             BtnAbout.Text = "Acerca De";
             BtnAbout.UseVisualStyleBackColor = true;
@@ -80,9 +82,10 @@
             BtnExcelTool.Dock = DockStyle.Top;
             BtnExcelTool.FlatAppearance.BorderSize = 0;
             BtnExcelTool.FlatStyle = FlatStyle.Flat;
-            BtnExcelTool.Location = new Point(0, 29);
+            BtnExcelTool.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            BtnExcelTool.Location = new Point(0, 35);
             BtnExcelTool.Name = "BtnExcelTool";
-            BtnExcelTool.Size = new Size(200, 23);
+            BtnExcelTool.Size = new Size(200, 29);
             BtnExcelTool.TabIndex = 1;
             BtnExcelTool.Text = "Excel";
             BtnExcelTool.UseVisualStyleBackColor = true;
@@ -93,9 +96,10 @@
             BtnPdfTool.Dock = DockStyle.Top;
             BtnPdfTool.FlatAppearance.BorderSize = 0;
             BtnPdfTool.FlatStyle = FlatStyle.Flat;
+            BtnPdfTool.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             BtnPdfTool.Location = new Point(0, 0);
             BtnPdfTool.Name = "BtnPdfTool";
-            BtnPdfTool.Size = new Size(200, 29);
+            BtnPdfTool.Size = new Size(200, 35);
             BtnPdfTool.TabIndex = 0;
             BtnPdfTool.Text = "Renombrador de PDFs";
             BtnPdfTool.UseVisualStyleBackColor = true;
