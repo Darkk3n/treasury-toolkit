@@ -113,7 +113,7 @@ namespace TreasuryToolkit.Infra.Services
             // Changing +? to + forces it to grab the whole phrase on that line.
             // The lookahead ensures that if "Referencia" is present, it stops right before it.
             #region Reason
-            Match reasonMatch = Regex.Match(rawPdfText, @"(?:Motivo|Concepto)\s+de\s+pago:\s*([^\r\n]+)", RegexOptions.IgnoreCase);
+            Match reasonMatch = Regex.Match(rawPdfText, @"(?:Motivo|Concepto|Detalle)\s+de\s+pago:\s*([^\r\n]+)", RegexOptions.IgnoreCase);
 
             if (reasonMatch.Success)
             {
