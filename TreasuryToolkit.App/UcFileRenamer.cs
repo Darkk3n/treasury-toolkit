@@ -301,14 +301,22 @@ namespace TreasuryToolkit.App
         private void ShowProgress()
         {
             loadingScreen = _progressFormFactory();
-            loadingScreen.StartPosition = FormStartPosition.Manual;
 
-            // Center it relative to the current form position
-            int centerX = this.Location.X + (this.Width - loadingScreen.Width) / 2;
-            int centerY = this.Location.Y + (this.Height - loadingScreen.Height) / 2;
-            loadingScreen.Location = new Point(centerX, centerY);
+            Form parentForm = this.FindForm();
 
-            loadingScreen.Show(this);
+            if (parentForm != null)
+            {
+                // Ensure manual positioning is allowed
+                loadingScreen.StartPosition = FormStartPosition.Manual;
+
+                // Calculate the dead-center point based on parent coordinates
+                int centerX = parentForm.Left + (parentForm.Width - loadingScreen.Width) / 2;
+                int centerY = parentForm.Top + (parentForm.Height - loadingScreen.Height) / 2;
+
+                loadingScreen.Location = new Point(centerX, centerY);
+            }
+
+            loadingScreen.Show(parentForm);
         }
 
         private void OpenResultsFolder()
