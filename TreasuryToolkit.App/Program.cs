@@ -21,7 +21,7 @@ namespace TreasuryToolkit.App
             var serviceProvider = serviceCollection.BuildServiceProvider();
 
             // 2. Start the app by requesting the Main Form from the container
-            var mainForm = serviceProvider.GetRequiredService<FileRenamerForm>();
+            var mainForm = serviceProvider.GetRequiredService<MainForm>();
 
             Application.Run(mainForm);
         }
@@ -29,6 +29,7 @@ namespace TreasuryToolkit.App
         private static void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<FileRenamerForm>();
+            services.AddTransient<MainForm>();
             services.AddTransient<ProgressForm>();
             services.AddSingleton<Func<ProgressForm>>(x => () => x.GetRequiredService<ProgressForm>());
             services.AddTransient<IPdfProcessor, TextPdfProcessor>();
