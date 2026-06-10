@@ -7,7 +7,7 @@ using TreasuryToolkit.Core.Models;
 
 namespace TreasuryToolkit.App
 {
-    public partial class FileRenamerForm : Form
+    public partial class UcFileRenamer : UserControl
     {
         #region Properties
         private readonly string settingsFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appsettings.local.json");
@@ -23,7 +23,7 @@ namespace TreasuryToolkit.App
         #endregion
 
         #region Constructor
-        public FileRenamerForm(Func<ProgressForm> progressFormFactory, IPdfProcessor pdfProcessor, IFileScanner fileScanner)
+        public UcFileRenamer(Func<ProgressForm> progressFormFactory, IPdfProcessor pdfProcessor, IFileScanner fileScanner)
         {
             InitializeComponent();
             _progressFormFactory = progressFormFactory;
@@ -37,7 +37,6 @@ namespace TreasuryToolkit.App
         {
             CmbCompany.SelectedIndex = 0;
             SetupGrid();
-            LoadSettings();
         }
 
         private void BtnClean_Click(object sender, EventArgs e)
@@ -201,12 +200,6 @@ namespace TreasuryToolkit.App
             LblFolder.Text = sourceDirectory;
         }
 
-        private void ChkDarkMode_CheckedChanged(object sender, EventArgs e)
-        {
-            ApplyTheme(ChkDarkMode.Checked);
-            SaveSettings();
-        }
-
         private void TxtConsecutive_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
@@ -260,7 +253,7 @@ namespace TreasuryToolkit.App
             return backupFolder;
         }
 
-        private void ApplyTheme(bool isDarkMode)
+        public void ApplyTheme(bool isDarkMode)
         {
             // Define your color palettes
             Color formBg = isDarkMode ? Color.FromArgb(30, 30, 30) : Color.FromKnownColor(KnownColor.ControlLightLight);
@@ -305,45 +298,25 @@ namespace TreasuryToolkit.App
             }
         }
 
-        private void SaveSettings()
-        {
-            var settings = new LocalAppSettings { IsDarkMode = ChkDarkMode.Checked };
-            string json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(settingsFilePath, json);
-        }
-
-        private void LoadSettings()
-        {
-            if (File.Exists(settingsFilePath))
-            {
-                try
-                {
-                    string json = File.ReadAllText(settingsFilePath);
-                    var settings = JsonSerializer.Deserialize<LocalAppSettings>(json);
-
-                    if (settings != null)
-                    {
-                        ChkDarkMode.Checked = settings.IsDarkMode;
-                    }
-                }
-                catch
-                {
-                    ChkDarkMode.Checked = false;
-                }
-            }
-        }
-
         private void ShowProgress()
         {
             loadingScreen = _progressFormFactory();
-            loadingScreen.StartPosition = FormStartPosition.Manual;
 
-            // Center it relative to the current form position
-            int centerX = this.Location.X + (this.Width - loadingScreen.Width) / 2;
-            int centerY = this.Location.Y + (this.Height - loadingScreen.Height) / 2;
-            loadingScreen.Location = new Point(centerX, centerY);
+            Form parentForm = this.FindForm();
 
-            loadingScreen.Show(this);
+            if (parentForm != null)
+            {
+                // Ensure manual positioning is allowed
+                loadingScreen.StartPosition = FormStartPosition.Manual;
+
+                // Calculate the dead-center point based on parent coordinates
+                int centerX = parentForm.Left + (parentForm.Width - loadingScreen.Width) / 2;
+                int centerY = parentForm.Top + (parentForm.Height - loadingScreen.Height) / 2;
+
+                loadingScreen.Location = new Point(centerX, centerY);
+            }
+
+            loadingScreen.Show(parentForm);
         }
 
         private void OpenResultsFolder()

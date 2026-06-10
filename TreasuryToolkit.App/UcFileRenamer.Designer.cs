@@ -1,6 +1,6 @@
 ﻿namespace TreasuryToolkit.App
 {
-    partial class FileRenamerForm
+    partial class UcFileRenamer
     {
         /// <summary>
         /// Required designer variable.
@@ -44,7 +44,6 @@
             BtnFileDialog = new Button();
             LblConsecutive = new Label();
             TxtConsecutive = new TextBox();
-            ChkDarkMode = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)DgvPayments).BeginInit();
             SuspendLayout();
             // 
@@ -201,24 +200,11 @@
             TxtConsecutive.Visible = false;
             TxtConsecutive.KeyPress += TxtConsecutive_KeyPress;
             // 
-            // ChkDarkMode
-            // 
-            ChkDarkMode.AutoSize = true;
-            ChkDarkMode.Location = new Point(1160, 12);
-            ChkDarkMode.Name = "ChkDarkMode";
-            ChkDarkMode.Size = new Size(124, 25);
-            ChkDarkMode.TabIndex = 10;
-            ChkDarkMode.Text = "Modo Oscuro";
-            ChkDarkMode.UseVisualStyleBackColor = true;
-            ChkDarkMode.CheckedChanged += ChkDarkMode_CheckedChanged;
-            // 
-            // FileRenamerForm
+            // UcFileRenamer
             // 
             AutoScaleDimensions = new SizeF(9F, 21F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ControlLightLight;
-            ClientSize = new Size(1323, 643);
-            Controls.Add(ChkDarkMode);
             Controls.Add(TxtConsecutive);
             Controls.Add(LblConsecutive);
             Controls.Add(BtnFileDialog);
@@ -230,12 +216,9 @@
             Controls.Add(DgvPayments);
             Controls.Add(BtnClean);
             Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            FormBorderStyle = FormBorderStyle.FixedSingle;
             Margin = new Padding(4);
-            MaximizeBox = false;
-            Name = "FileRenamerForm";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "Tesoreria - Renombrador de Archivos";
+            Name = "UcFileRenamer";
+            Size = new Size(1323, 643);
             Load += FileRenamerForm_Load;
             ((System.ComponentModel.ISupportInitialize)DgvPayments).EndInit();
             ResumeLayout(false);
@@ -260,6 +243,5 @@
         private DataGridViewTextBoxColumn Column2;
         private Label LblConsecutive;
         private TextBox TxtConsecutive;
-        private CheckBox ChkDarkMode;
     }
 }
