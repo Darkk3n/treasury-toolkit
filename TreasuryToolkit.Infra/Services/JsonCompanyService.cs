@@ -3,35 +3,36 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using TreasuryToolkit.Core.Contracts;
+using TreasuryToolkit.Core.Models;
 
 namespace TreasuryToolkit.Infra.Services
 {
     public class JsonCompanyService : ICompanyService
     {
-        private readonly List<string> _companies;
+        private readonly List<CompanyModel> _companies;
 
         public JsonCompanyService()
         {
             try
             {
-                string jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "companies.json");
+                string jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\companies.json");
 
                 if (File.Exists(jsonPath))
                 {
                     string jsonContent = File.ReadAllText(jsonPath);
-                    _companies = JsonSerializer.Deserialize<List<string>>(jsonContent) ?? [];
+                    _companies = JsonSerializer.Deserialize<List<CompanyModel>>(jsonContent) ?? [];
                 }
                 else
                 {
-                    _companies = ["Error: companies.json missing"];
+                    _companies = [new() { Id = "ERR", Name = "companies.json no encontrado" }];
                 }
             }
             catch
             {
-                _companies = ["Error loading companies"];
+                _companies = [new() { Id = "ERR", Name = "Error al cargar lista de empresas" }];
             }
         }
 
-        public IReadOnlyList<string> GetCompanyNames() => _companies;
+        public IReadOnlyList<CompanyModel> GetCompanyNames() => _companies;
     }
 }

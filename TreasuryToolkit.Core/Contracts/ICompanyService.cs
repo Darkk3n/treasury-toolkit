@@ -1,7 +1,9 @@
-﻿namespace TreasuryToolkit.Core.Contracts
+﻿using TreasuryToolkit.Core.Models;
+
+namespace TreasuryToolkit.Core.Contracts
 {
     public interface ICompanyService
     {
-        IReadOnlyList<string> GetCompanyNames();
+        IReadOnlyList<CompanyModel> GetCompanyNames();
     }
 }
