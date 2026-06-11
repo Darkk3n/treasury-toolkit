@@ -34,6 +34,7 @@ namespace TreasuryToolkit.App
             services.AddSingleton<Func<ProgressForm>>(x => () => x.GetRequiredService<ProgressForm>());
             services.AddTransient<IPdfProcessor, TextPdfProcessor>();
             services.AddTransient<IFileScanner, LocalFileScanner>();
+            services.AddSingleton<ICompanyService, JsonCompanyService>();
         }
     }
 }

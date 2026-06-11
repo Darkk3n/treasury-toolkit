@@ -14,14 +14,16 @@ namespace TreasuryToolkit.App
         private readonly Func<ProgressForm> progressFormFactory;
         private readonly IPdfProcessor pdfProcessor;
         private readonly IFileScanner fileScanner;
+        private readonly ICompanyService companyService;
         #endregion
 
         #region Constructor
-        public MainForm(Func<ProgressForm> progressFormFactory, IPdfProcessor pdfProcessor, IFileScanner fileScanner)
+        public MainForm(Func<ProgressForm> progressFormFactory, IPdfProcessor pdfProcessor, IFileScanner fileScanner, ICompanyService companyService)
         {
             this.progressFormFactory = progressFormFactory;
             this.pdfProcessor = pdfProcessor;
             this.fileScanner = fileScanner;
+            this.companyService = companyService;
             InitializeComponent();
             InitViews();
             LoadSettings();
@@ -121,7 +123,7 @@ namespace TreasuryToolkit.App
 
         private void InitViews()
         {
-            _fileRenamer = new UcFileRenamer(progressFormFactory, pdfProcessor, fileScanner)
+            _fileRenamer = new UcFileRenamer(progressFormFactory, pdfProcessor, fileScanner, companyService)
             {
                 Dock = DockStyle.Fill
             };

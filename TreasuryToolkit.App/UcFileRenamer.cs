@@ -20,15 +20,33 @@ namespace TreasuryToolkit.App
         private readonly Func<ProgressForm> _progressFormFactory;
         private readonly IPdfProcessor pdfProcessor;
         private readonly IFileScanner fileScanner;
+        private readonly ICompanyService companyService;
         #endregion
 
         #region Constructor
-        public UcFileRenamer(Func<ProgressForm> progressFormFactory, IPdfProcessor pdfProcessor, IFileScanner fileScanner)
+        public UcFileRenamer(Func<ProgressForm> progressFormFactory, IPdfProcessor pdfProcessor, IFileScanner fileScanner, ICompanyService companyService)
         {
             InitializeComponent();
             _progressFormFactory = progressFormFactory;
             this.pdfProcessor = pdfProcessor;
             this.fileScanner = fileScanner;
+            this.companyService = companyService;
+            SetupCombobox();
+        }
+
+        private void SetupCombobox()
+        {
+            var companyList = companyService.GetCompanyNames();
+            CmbCompany.Items.Clear();
+            CmbCompany.DropDownStyle = ComboBoxStyle.DropDown;
+            CmbCompany.Items.AddRange([..companyList]);
+            CmbCompany.ValueMember = nameof(CompanyModel.Id);
+            CmbCompany.DisplayMember = nameof(CompanyModel.Name);
+            CmbCompany.AutoCompleteCustomSource.AddRange([.. companyList.Select(r => r.Name)]);
+            CmbCompany.AutoCompleteSource = AutoCompleteSource.CustomSource;
+            CmbCompany.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            CmbCompany.Items.Insert(0, "-- SELECCIONE --");
+            CmbCompany.SelectedIndex = 0;
         }
         #endregion
 
