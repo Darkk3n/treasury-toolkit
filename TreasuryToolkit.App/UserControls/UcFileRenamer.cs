@@ -39,7 +39,7 @@ namespace TreasuryToolkit.App
             var companyList = companyService.GetCompanyNames();
             CmbCompany.Items.Clear();
             CmbCompany.DropDownStyle = ComboBoxStyle.DropDown;
-            CmbCompany.Items.AddRange([..companyList]);
+            CmbCompany.Items.AddRange([.. companyList]);
             CmbCompany.ValueMember = nameof(CompanyModel.Id);
             CmbCompany.DisplayMember = nameof(CompanyModel.Name);
             CmbCompany.AutoCompleteCustomSource.AddRange([.. companyList.Select(r => r.Name)]);
@@ -229,9 +229,12 @@ namespace TreasuryToolkit.App
 
         private void CmbCompany_SelectedIndexChanged(object sender, EventArgs e)
         {
-            LblConsecutive.Visible = CmbCompany.SelectedIndex != 0 && CmbCompany.SelectedItem.ToString() == "EMKA";
-            TxtConsecutive.Visible = CmbCompany.SelectedIndex != 0 && CmbCompany.SelectedItem.ToString() == "EMKA";
-            if (CmbCompany.SelectedItem.ToString() != "EMKA")
+            if (CmbCompany.SelectedIndex == 0) return;
+
+            var selectedCompany = (CompanyModel)CmbCompany.SelectedItem;
+            LblConsecutive.Visible = CmbCompany.SelectedIndex != 0 && selectedCompany.Name == "EMKA";
+            TxtConsecutive.Visible = CmbCompany.SelectedIndex != 0 && selectedCompany.Name == "EMKA";
+            if (selectedCompany.Name != "EMKA")
             {
                 TxtConsecutive.Text = string.Empty;
             }
