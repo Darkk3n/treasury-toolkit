@@ -5,6 +5,7 @@ namespace TreasuryToolkit.App
 {
     public partial class MainForm : Form
     {
+        #region Properties
         private readonly string settingsFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appsettings.local.json");
         private bool _isDarkMode = false;
         private UserControl _currentView;
@@ -13,7 +14,9 @@ namespace TreasuryToolkit.App
         private readonly Func<ProgressForm> progressFormFactory;
         private readonly IPdfProcessor pdfProcessor;
         private readonly IFileScanner fileScanner;
+        #endregion
 
+        #region Constructor
         public MainForm(Func<ProgressForm> progressFormFactory, IPdfProcessor pdfProcessor, IFileScanner fileScanner)
         {
             this.progressFormFactory = progressFormFactory;
@@ -24,7 +27,30 @@ namespace TreasuryToolkit.App
             LoadSettings();
             ShowView(_fileRenamer);
         }
+        #endregion
 
+        #region UI Control Events
+        private void ChkGlobalTheme_CheckedChanged(object sender, EventArgs e)
+        {
+            _isDarkMode = !_isDarkMode;
+            UpdateApplicationTheme();
+            SaveSettings();
+        }
+
+        private void BtnPdfTool_Click(object sender, EventArgs e)
+        {
+            ShowView(_fileRenamer);
+            UpdateButtonHighlight(BtnPdfTool);
+        }
+
+        private void BtnExcelTool_Click(object sender, EventArgs e)
+        {
+            ShowView(_excelWorkflowAutomator);
+            UpdateButtonHighlight(BtnExcelTool);
+        }
+        #endregion
+
+        #region Helpers
         private void LoadSettings()
         {
             if (File.Exists(settingsFilePath))
@@ -105,22 +131,11 @@ namespace TreasuryToolkit.App
             };
         }
 
-        private void ChkGlobalTheme_CheckedChanged(object sender, EventArgs e)
+        private void SaveSettings()
         {
-            _isDarkMode = !_isDarkMode;
-            UpdateApplicationTheme();
-        }
-
-        private void BtnPdfTool_Click(object sender, EventArgs e)
-        {
-            ShowView(_fileRenamer);
-            UpdateButtonHighlight(BtnPdfTool);
-        }
-
-        private void BtnExcelTool_Click(object sender, EventArgs e)
-        {
-            ShowView(_excelWorkflowAutomator);
-            UpdateButtonHighlight(BtnExcelTool);
+            var settings = new LocalAppSettings { IsDarkMode = ChkGlobalTheme.Checked };
+            string json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(settingsFilePath, json);
         }
 
         private void UpdateButtonHighlight(Button activeButton)
@@ -139,6 +154,7 @@ namespace TreasuryToolkit.App
                     button.ForeColor = _isDarkMode ? Color.DarkGray : Color.FromArgb(64, 64, 64);
                 }
             }
-        }
+        } 
+        #endregion
     }
 }
