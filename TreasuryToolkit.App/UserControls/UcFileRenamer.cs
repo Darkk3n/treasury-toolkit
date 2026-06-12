@@ -161,7 +161,7 @@ namespace TreasuryToolkit.App
             Thread.Sleep(300);
             loadingScreen.Close();
             DeleteBackUp(backupFolder);
-            MessageBox.Show("Proceso Completado con Éxito!", "Exito!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Proceso Completado con Éxito!", "Éxito!", MessageBoxButtons.OK, MessageBoxIcon.Information);
             OpenResultsFolder();
         }
 
