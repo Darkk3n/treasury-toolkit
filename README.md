@@ -14,8 +14,8 @@ TreasuryToolkit is a high-performance Windows desktop utility suite built with *
 * **Excel Automation Engine:** Loop-free, LINQ-powered spreadsheet manipulation utilizing `ClosedXML` to automate column filtering, row counting, and aggregate math workflows.
 
 ## How It Works
-1. **Target:** Launch the application and select a workspace folder or drag-and-drop your target files.
-2. **Pattern:** Input your desired formatting schema using the token guide below.
+1. **Target:** Launch the application and select a workspace folder with the target files.
+2. **Pattern:** Inputs the previously stablished formatting and data points needed.
 3. **Verify:** Check the Preview Data Grid to ensure token expansions map perfectly.
 4. **Execute:** Commit the change with absolute confidence.
 
