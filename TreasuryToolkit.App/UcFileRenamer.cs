@@ -39,7 +39,7 @@ namespace TreasuryToolkit.App
             var companyList = companyService.GetCompanyNames();
             CmbCompany.Items.Clear();
             CmbCompany.DropDownStyle = ComboBoxStyle.DropDown;
-            CmbCompany.Items.AddRange([..companyList]);
+            CmbCompany.Items.AddRange([.. companyList]);
             CmbCompany.ValueMember = nameof(CompanyModel.Id);
             CmbCompany.DisplayMember = nameof(CompanyModel.Name);
             CmbCompany.AutoCompleteCustomSource.AddRange([.. companyList.Select(r => r.Name)]);
@@ -141,22 +141,40 @@ namespace TreasuryToolkit.App
 
             int totalRows = paymentRows.Count;
             int startConsecutive = string.IsNullOrEmpty(TxtConsecutive.Text) ? 0 : int.Parse(TxtConsecutive.Text);
-
-            pdfProcessor.ProcessPaymentBatch(files, paymentRows, CmbCompany.SelectedItem.ToString(), startConsecutive,
-                (currentRowIndex, currentFileName) =>
+            var company = (CompanyModel) CmbCompany.SelectedItem;
+            var retry = true;
+            while (retry)
+            {
+                try
                 {
-                    // This code runs INSIDE the loop of the service, but executes on the Form!
-                    if (loadingScreen != null && loadingScreen.Controls["lblStatus"] != null)
-                    {
-                        int humanRowIndex = currentRowIndex == totalRows ? totalRows : currentRowIndex + 1;
-                        loadingScreen.Controls["lblStatus"].Text = $"Procesando fila {humanRowIndex} de {totalRows}: {currentFileName}...";
-                        loadingScreen.Refresh();
-                    }
+                    pdfProcessor.ProcessPaymentBatch(files, paymentRows, company.Name, startConsecutive,
+                       (currentRowIndex, currentFileName) =>
+                       {
+                           // This code runs INSIDE the loop of the service, but executes on the Form!
+                           if (loadingScreen != null && loadingScreen.Controls["lblStatus"] != null)
+                           {
+                               int humanRowIndex = currentRowIndex == totalRows ? totalRows : currentRowIndex + 1;
+                               loadingScreen.Controls["lblStatus"].Text = $"Procesando fila {humanRowIndex} de {totalRows}: {currentFileName}...";
+                               loadingScreen.Refresh();
+                           }
 
-                    // Keep the UI thread breathing and layout moving smoothly
-                    Application.DoEvents();
-                    Thread.Sleep(150);
-                });
+                           // Keep the UI thread breathing and layout moving smoothly
+                           Application.DoEvents();
+                           Thread.Sleep(150);
+                       });
+                    retry = false;
+                }
+                catch (InvalidOperationException ex)
+                {
+                    var result = MessageBox.Show(ex.Message, "Archivo en uso", MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning);
+
+                    if (result == DialogResult.Cancel)
+                    {
+                        retry = false;
+                    }
+                }
+            }
+
             Thread.Sleep(300);
             loadingScreen.Close();
             DeleteBackUp(backupFolder);
