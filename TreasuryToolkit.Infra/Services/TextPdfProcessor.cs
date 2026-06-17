@@ -19,6 +19,11 @@ namespace TreasuryToolkit.Infra.Services
             bool useConsecutive = companyName == "EMKA";
             List<string> filesToDelete = [];
 
+            if (files.Any(IsFileLocked))
+            {
+                throw new InvalidOperationException("Uno mas archivos se encuentran abiertos en otro programa. Por favor cierra todos los archivos abiertos e intenta de nuevo.");
+            }
+
             for (int i = 0; i < rows.Count; i++)
             {
                 if (currentFileIndex >= files.Length) break;
@@ -109,6 +114,21 @@ namespace TreasuryToolkit.Infra.Services
             var pageForm = sourcePage.CopyAsFormXObject(targetDoc);
             PdfCanvas canvas = new(newPage);
             canvas.AddXObjectAt(pageForm, 0, 0);
+        }
+
+        private static bool IsFileLocked(string filePath)
+        {
+            try
+            {
+                using var stream = File.Open(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+                stream.Close();
+            }
+            catch (IOException)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
