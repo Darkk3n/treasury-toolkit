@@ -141,13 +141,13 @@ namespace TreasuryToolkit.App
 
             int totalRows = paymentRows.Count;
             int startConsecutive = string.IsNullOrEmpty(TxtConsecutive.Text) ? 0 : int.Parse(TxtConsecutive.Text);
-
+            var company = (CompanyModel) CmbCompany.SelectedItem;
             var retry = true;
             while (retry)
             {
                 try
                 {
-                    pdfProcessor.ProcessPaymentBatch(files, paymentRows, CmbCompany.SelectedItem.ToString(), startConsecutive,
+                    pdfProcessor.ProcessPaymentBatch(files, paymentRows, company.Name, startConsecutive,
                        (currentRowIndex, currentFileName) =>
                        {
                            // This code runs INSIDE the loop of the service, but executes on the Form!
