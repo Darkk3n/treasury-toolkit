@@ -28,6 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             DgvResults = new DataGridView();
             Column1 = new DataGridViewTextBoxColumn();
             Column2 = new DataGridViewTextBoxColumn();
@@ -50,28 +52,46 @@
             // 
             // DgvResults
             // 
-            DgvResults.AllowUserToAddRows = false;
             DgvResults.AllowUserToDeleteRows = false;
             DgvResults.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             DgvResults.BackgroundColor = Color.White;
             DgvResults.BorderStyle = BorderStyle.None;
+            DgvResults.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
             DgvResults.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             DgvResults.Columns.AddRange(new DataGridViewColumn[] { Column1, Column2, Column3, Column4, Column5, Column6, Column7, Column8, Column9, Column10, Column11, Column12 });
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = SystemColors.Window;
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle1.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.False;
+            DgvResults.DefaultCellStyle = dataGridViewCellStyle1;
             DgvResults.Dock = DockStyle.Bottom;
             DgvResults.EnableHeadersVisualStyles = false;
-            DgvResults.Location = new Point(0, 127);
+            DgvResults.Location = new Point(0, 139);
+            DgvResults.Margin = new Padding(4);
             DgvResults.Name = "DgvResults";
-            DgvResults.Size = new Size(1323, 516);
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = SystemColors.Control;
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+            DgvResults.RowHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            DgvResults.ScrollBars = ScrollBars.Vertical;
+            DgvResults.Size = new Size(1323, 504);
             DgvResults.TabIndex = 0;
             // 
             // Column1
             // 
-            Column1.HeaderText = "Tarjetas: # Operaciones";
+            Column1.HeaderText = "TDDE: # Operaciones";
             Column1.Name = "Column1";
             // 
             // Column2
             // 
-            Column2.HeaderText = "Tarjetas: $ Operaciones";
+            Column2.HeaderText = "TDDE: $ Operaciones";
             Column2.Name = "Column2";
             // 
             // Column3
@@ -86,32 +106,32 @@
             // 
             // Column5
             // 
-            Column5.HeaderText = "Transferencias Interbancarias: # Operaciones";
+            Column5.HeaderText = "SPEI/SPID: # Operaciones";
             Column5.Name = "Column5";
             // 
             // Column6
             // 
-            Column6.HeaderText = "Transferencias Interbancarias: $ Operaciones";
+            Column6.HeaderText = "SPEI/SPID: $ Operaciones";
             Column6.Name = "Column6";
             // 
             // Column7
             // 
-            Column7.HeaderText = "Transferencia Mismo Banco: # Opereaciones";
+            Column7.HeaderText = "BBVA: # Opereaciones";
             Column7.Name = "Column7";
             // 
             // Column8
             // 
-            Column8.HeaderText = "Transferencia Mismo Banco: $ Operaciones";
+            Column8.HeaderText = "BBVA: $ Operaciones";
             Column8.Name = "Column8";
             // 
             // Column9
             // 
-            Column9.HeaderText = "Transferencia Internacional: # Operaciones";
+            Column9.HeaderText = "Internac.: # Operaciones";
             Column9.Name = "Column9";
             // 
             // Column10
             // 
-            Column10.HeaderText = "Transferencia Internacional: $ Operaciones";
+            Column10.HeaderText = "Internac.: $ Operaciones";
             Column10.Name = "Column10";
             // 
             // Column11

@@ -53,6 +53,6 @@ namespace TreasuryToolkit.App
                     dgv.GridColor = isDarkMode ? Color.FromArgb(63, 63, 70) : Color.LightGray;
                 }
             }
-        }
+        }             
     }
 }
