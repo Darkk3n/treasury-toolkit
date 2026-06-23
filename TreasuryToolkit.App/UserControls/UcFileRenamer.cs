@@ -178,7 +178,7 @@ namespace TreasuryToolkit.App
             Thread.Sleep(300);
             loadingScreen.Close();
             DeleteBackUp(backupFolder);
-            MessageBox.Show("Proceso Completado con Éxito!", "Exito!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Proceso Completado con Éxito!", "Éxito!", MessageBoxButtons.OK, MessageBoxIcon.Information);
             OpenResultsFolder();
         }
 
@@ -247,9 +247,12 @@ namespace TreasuryToolkit.App
 
         private void CmbCompany_SelectedIndexChanged(object sender, EventArgs e)
         {
-            LblConsecutive.Visible = CmbCompany.SelectedIndex != 0 && CmbCompany.SelectedItem.ToString() == "EMKA";
-            TxtConsecutive.Visible = CmbCompany.SelectedIndex != 0 && CmbCompany.SelectedItem.ToString() == "EMKA";
-            if (CmbCompany.SelectedItem.ToString() != "EMKA")
+            if (CmbCompany.SelectedIndex == 0) return;
+
+            var selectedCompany = (CompanyModel)CmbCompany.SelectedItem;
+            LblConsecutive.Visible = CmbCompany.SelectedIndex != 0 && selectedCompany.Name == "EMKA";
+            TxtConsecutive.Visible = CmbCompany.SelectedIndex != 0 && selectedCompany.Name == "EMKA";
+            if (selectedCompany.Name != "EMKA")
             {
                 TxtConsecutive.Text = string.Empty;
             }
