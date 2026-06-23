@@ -177,9 +177,9 @@ namespace TreasuryToolkit.App
 
             Thread.Sleep(300);
             loadingScreen.Close();
-            EnableControls(true);
             DeleteBackUp(backupFolder);
             MessageBox.Show("Proceso Completado con Éxito!", "Éxito!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            EnableControls(true);
             OpenResultsFolder();
         }
 
@@ -195,6 +195,7 @@ namespace TreasuryToolkit.App
             //{
             //    return;
             //}
+            EnableControls(false);
             string extractedDate = DgvPayments.Rows[0].Cells[0].Value.ToString();
 
             DgvPayments.Rows.Clear();
@@ -235,6 +236,7 @@ namespace TreasuryToolkit.App
             loadingScreen.Close();
             MessageBox.Show($"Se escanearon y cargaron {files.Count}(s) archivo(s) en la tabla.", "Escaneo Completado", MessageBoxButtons.OK, MessageBoxIcon.Information);
             LblFolder.Text = sourceDirectory;
+            EnableControls(true);
         }
 
         private void TxtConsecutive_KeyPress(object sender, KeyPressEventArgs e)
