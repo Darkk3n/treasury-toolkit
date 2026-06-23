@@ -119,7 +119,7 @@ namespace TreasuryToolkit.App
             {
                 return;
             }
-
+            EnableControls(false);
             var backupFolder = BackupSourceFiles(LblFolder.Text);
             var files = Directory.GetFiles(LblFolder.Text, "*.pdf").ToArray();
             Array.Sort(files, (x, y) => StrCmpLogicalW(x, y)); // Enforces 1, 2, 3, 10 order
@@ -179,6 +179,7 @@ namespace TreasuryToolkit.App
             loadingScreen.Close();
             DeleteBackUp(backupFolder);
             MessageBox.Show("Proceso Completado con Éxito!", "Éxito!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            EnableControls(true);
             OpenResultsFolder();
         }
 
@@ -194,6 +195,7 @@ namespace TreasuryToolkit.App
             //{
             //    return;
             //}
+            EnableControls(false);
             string extractedDate = DgvPayments.Rows[0].Cells[0].Value.ToString();
 
             DgvPayments.Rows.Clear();
@@ -234,6 +236,7 @@ namespace TreasuryToolkit.App
             loadingScreen.Close();
             MessageBox.Show($"Se escanearon y cargaron {files.Count}(s) archivo(s) en la tabla.", "Escaneo Completado", MessageBoxButtons.OK, MessageBoxIcon.Information);
             LblFolder.Text = sourceDirectory;
+            EnableControls(true);
         }
 
         private void TxtConsecutive_KeyPress(object sender, KeyPressEventArgs e)
@@ -408,6 +411,15 @@ namespace TreasuryToolkit.App
             }
 
             return true;
+        }
+
+        private void EnableControls(bool value)
+        {
+            BtnFileDialog.Enabled = value;
+            BtnStart.Enabled = value;
+            BtnClean.Enabled = value;
+            CmbCompany.Enabled = value;
+            DgvPayments.Enabled = value;
         }
         #endregion
     }
