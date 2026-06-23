@@ -110,14 +110,14 @@
             PnlMainContent.Dock = DockStyle.Fill;
             PnlMainContent.Location = new Point(200, 0);
             PnlMainContent.Name = "PnlMainContent";
-            PnlMainContent.Size = new Size(999, 603);
+            PnlMainContent.Size = new Size(1049, 603);
             PnlMainContent.TabIndex = 1;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1199, 603);
+            ClientSize = new Size(1249, 603);
             Controls.Add(PnlMainContent);
             Controls.Add(PnlSideBar);
             ForeColor = Color.White;
