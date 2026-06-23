@@ -119,7 +119,7 @@ namespace TreasuryToolkit.App
             {
                 return;
             }
-
+            EnableControls(false);
             var backupFolder = BackupSourceFiles(LblFolder.Text);
             var files = Directory.GetFiles(LblFolder.Text, "*.pdf").ToArray();
             Array.Sort(files, (x, y) => StrCmpLogicalW(x, y)); // Enforces 1, 2, 3, 10 order
@@ -177,6 +177,7 @@ namespace TreasuryToolkit.App
 
             Thread.Sleep(300);
             loadingScreen.Close();
+            EnableControls(true);
             DeleteBackUp(backupFolder);
             MessageBox.Show("Proceso Completado con Éxito!", "Éxito!", MessageBoxButtons.OK, MessageBoxIcon.Information);
             OpenResultsFolder();
@@ -408,6 +409,15 @@ namespace TreasuryToolkit.App
             }
 
             return true;
+        }
+
+        private void EnableControls(bool value)
+        {
+            BtnFileDialog.Enabled = value;
+            BtnStart.Enabled = value;
+            BtnClean.Enabled = value;
+            CmbCompany.Enabled = value;
+            DgvPayments.Enabled = value;
         }
         #endregion
     }
