@@ -45,6 +45,7 @@ namespace TreasuryToolkit.Infra.Services
                 var consecutivePart = useConsecutive ? $"{consecutiveNumber}-" : "";
                 string newFileName = $"{row.Date}-{companyName}-{consecutivePart}{vendor} {concept}-{amount} {currency}.pdf";
                 string destinationPath = Path.Combine(directory, newFileName);
+                string safeDestinationPath = GetUniqueFilePath(destinationPath);
 
                 int totalPagesInFile = 0;
 
@@ -56,7 +57,7 @@ namespace TreasuryToolkit.Infra.Services
                 {
                     totalPagesInFile = sourcePdfDoc.GetNumberOfPages();
 
-                    using (PdfWriter writer = new(destinationPath))
+                    using (PdfWriter writer = new(safeDestinationPath))
                     using (PdfDocument newSinglePagePdf = new(writer))
                     {
                         if (companyName == "EMKA")
@@ -129,6 +130,32 @@ namespace TreasuryToolkit.Infra.Services
             }
 
             return false;
+        }
+
+        private static string GetUniqueFilePath(string targetFilePath)
+        {
+            if (!File.Exists(targetFilePath))
+            {
+                return targetFilePath;
+            }
+
+            // Deconstruct the file so we don't accidentally mess up the extension
+            string directory = Path.GetDirectoryName(targetFilePath) ?? string.Empty;
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(targetFilePath);
+            string extension = Path.GetExtension(targetFilePath);
+
+            int counter = 1;
+            string uniqueFilePath = targetFilePath;
+
+            // 🚀 Loop until we find a filename that does NOT exist on the disk
+            while (File.Exists(uniqueFilePath))
+            {
+                string newFileName = $"{fileNameWithoutExt}_{counter}{extension}";
+                uniqueFilePath = Path.Combine(directory, newFileName);
+
+                counter++;
+            }
+            return uniqueFilePath;
         }
     }
 }
