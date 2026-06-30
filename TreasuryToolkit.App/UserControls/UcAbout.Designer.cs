@@ -1,4 +1,4 @@
-﻿namespace TreasuryToolkit.App.UserControls
+﻿namespace TreasuryToolkit.App
 {
     partial class UcAbout
     {

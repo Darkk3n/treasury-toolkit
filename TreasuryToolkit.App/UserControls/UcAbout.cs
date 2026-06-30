@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
-namespace TreasuryToolkit.App.UserControls
+namespace TreasuryToolkit.App
 {
     public partial class UcAbout : UserControl
     {
