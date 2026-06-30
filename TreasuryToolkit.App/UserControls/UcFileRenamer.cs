@@ -196,7 +196,6 @@ namespace TreasuryToolkit.App
             //    return;
             //}
             EnableControls(false);
-            string extractedDate = DgvPayments.Rows[0].Cells[0].Value.ToString();
 
             DgvPayments.Rows.Clear();
             //TODO: Revert this hardcoded path
@@ -214,7 +213,7 @@ namespace TreasuryToolkit.App
 
             ShowProgress();
 
-            fileScanner.ScanPdfFiles(extractedDate, [.. files],
+            fileScanner.ScanPdfFiles([.. files],
                 onProgress: (statusMessage) =>
                 {
                     if (loadingScreen != null && loadingScreen.Controls["lblStatus"] != null)

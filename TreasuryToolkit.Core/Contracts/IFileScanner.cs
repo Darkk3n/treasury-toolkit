@@ -4,6 +4,6 @@ namespace TreasuryToolkit.Core.Contracts
 {
     public interface IFileScanner
     {
-        void ScanPdfFiles(string date, string[] files, Action<string> onProgress, Action<ScannedPaymentData> onRowExtracted);
+        void ScanPdfFiles(string[] files, Action<string> onProgress, Action<ScannedPaymentData> onRowExtracted);
     }
 }
