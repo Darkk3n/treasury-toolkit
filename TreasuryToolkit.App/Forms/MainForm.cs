@@ -15,6 +15,8 @@ namespace TreasuryToolkit.App
         private readonly IPdfProcessor pdfProcessor;
         private readonly IFileScanner fileScanner;
         private readonly ICompanyService companyService;
+        private ImageList _lightThemeIcons;
+        private ImageList _darkThemeIcons;
         #endregion
 
         #region Constructor
@@ -27,6 +29,8 @@ namespace TreasuryToolkit.App
             InitializeComponent();
             InitViews();
             LoadSettings();
+            InitializeIconContainers();
+            ConfigureSidebarButtonLayouts();
             ShowView(_fileRenamer);
         }
         #endregion
@@ -86,6 +90,9 @@ namespace TreasuryToolkit.App
                 BtnPdfTool.ForeColor = Color.White;
                 BtnExcelTool.ForeColor = Color.White;
                 BtnAbout.ForeColor = Color.White;
+                BtnPdfTool.ImageList = _darkThemeIcons;
+                BtnExcelTool.ImageList = _darkThemeIcons;
+                BtnAbout.ImageList = _darkThemeIcons;
                 ChkGlobalTheme.ForeColor = Color.White;
             }
             else
@@ -97,6 +104,9 @@ namespace TreasuryToolkit.App
                 BtnExcelTool.ForeColor = Color.Black;
                 ChkGlobalTheme.ForeColor = Color.Black;
                 BtnAbout.ForeColor = Color.Black;
+                BtnPdfTool.ImageList = _lightThemeIcons;
+                BtnExcelTool.ImageList = _lightThemeIcons;
+                BtnAbout.ImageList = _lightThemeIcons;
             }
 
             if (_currentView is UcFileRenamer pdfView)
@@ -156,7 +166,43 @@ namespace TreasuryToolkit.App
                     button.ForeColor = _isDarkMode ? Color.DarkGray : Color.FromArgb(64, 64, 64);
                 }
             }
-        } 
+        }
+
+        private void InitializeIconContainers()
+        {
+            _lightThemeIcons = new ImageList { ImageSize = new Size(24, 24), ColorDepth = ColorDepth.Depth32Bit };
+            _darkThemeIcons = new ImageList { ImageSize = new Size(24, 24), ColorDepth = ColorDepth.Depth32Bit };
+
+            _lightThemeIcons.Images.Add(Properties.Resources.PDF_Black); // Dark gray icon for light background
+            _darkThemeIcons.Images.Add(Properties.Resources.PDF_White);   // White icon for dark background
+
+            _lightThemeIcons.Images.Add(Properties.Resources.Excel_Black);
+            _darkThemeIcons.Images.Add(Properties.Resources.Excel_White);
+
+            _lightThemeIcons.Images.Add(Properties.Resources.About_Black);
+            _darkThemeIcons.Images.Add(Properties.Resources.About_White);
+        }
+
+        private void ConfigureSidebarButtonLayouts()
+        {
+            BtnPdfTool.TextImageRelation = TextImageRelation.ImageBeforeText;
+            BtnPdfTool.ImageAlign = ContentAlignment.MiddleLeft;
+            BtnPdfTool.TextAlign = ContentAlignment.MiddleLeft;
+            BtnPdfTool.Padding = new Padding(15, 0, 0, 0);
+            BtnPdfTool.ImageIndex = 0;
+
+            BtnExcelTool.TextImageRelation = TextImageRelation.ImageBeforeText;
+            BtnExcelTool.ImageAlign = ContentAlignment.MiddleLeft;
+            BtnExcelTool.TextAlign = ContentAlignment.MiddleLeft;
+            BtnExcelTool.Padding = new Padding(15, 0, 0, 0);
+            BtnExcelTool.ImageIndex = 1;
+
+            BtnAbout.TextImageRelation = TextImageRelation.ImageBeforeText;
+            BtnAbout.ImageAlign = ContentAlignment.MiddleLeft;
+            BtnAbout.TextAlign = ContentAlignment.MiddleLeft;
+            BtnAbout.Padding = new Padding(15, 0, 0, 0);
+            BtnAbout.ImageIndex = 2;
+        }
         #endregion
     }
 }
