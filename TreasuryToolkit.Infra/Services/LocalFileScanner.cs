@@ -115,7 +115,7 @@ namespace TreasuryToolkit.Infra.Services
             // Changing +? to + forces it to grab the whole phrase on that line.
             // The lookahead ensures that if "Referencia" is present, it stops right before it.
             #region Reason
-            Match reasonMatch = Regex.Match(rawPdfText, @"(?:Motivo|Concepto|Detalle)\s+de\s+pago:\s*([^\r\n]+)", RegexOptions.IgnoreCase);
+            Match reasonMatch = Regex.Match(rawPdfText, @"(?:Motivo\s+de\s+pago:|Concepto\s+de\s+pago:|Detalle\s+de\s+pago:|Concepto\s+CIE:)\s*([^\r\n]+)", RegexOptions.IgnoreCase);
 
             if (reasonMatch.Success)
             {
@@ -218,7 +218,7 @@ namespace TreasuryToolkit.Infra.Services
                 var rawDate = dateMatch.Groups[1].Value;
                 DateTime parsedDate = DateTime.ParseExact(rawDate, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
                 date = parsedDate.ToString("yyyyMMdd");
-            } 
+            }
             #endregion
         }
     }
