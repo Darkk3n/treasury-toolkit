@@ -47,7 +47,7 @@
             PnlSideBar.Dock = DockStyle.Left;
             PnlSideBar.Location = new Point(0, 0);
             PnlSideBar.Name = "PnlSideBar";
-            PnlSideBar.Size = new Size(200, 603);
+            PnlSideBar.Size = new Size(236, 603);
             PnlSideBar.TabIndex = 0;
             // 
             // ChkGlobalTheme
@@ -58,7 +58,7 @@
             ChkGlobalTheme.Location = new Point(0, 578);
             ChkGlobalTheme.Name = "ChkGlobalTheme";
             ChkGlobalTheme.Padding = new Padding(40, 0, 0, 0);
-            ChkGlobalTheme.Size = new Size(200, 25);
+            ChkGlobalTheme.Size = new Size(236, 25);
             ChkGlobalTheme.TabIndex = 3;
             ChkGlobalTheme.Text = "Modo Oscuro";
             ChkGlobalTheme.UseVisualStyleBackColor = true;
@@ -72,7 +72,7 @@
             BtnAbout.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             BtnAbout.Location = new Point(0, 64);
             BtnAbout.Name = "BtnAbout";
-            BtnAbout.Size = new Size(200, 31);
+            BtnAbout.Size = new Size(236, 31);
             BtnAbout.TabIndex = 2;
             BtnAbout.Text = "Acerca De";
             BtnAbout.UseVisualStyleBackColor = true;
@@ -85,7 +85,7 @@
             BtnExcelTool.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             BtnExcelTool.Location = new Point(0, 35);
             BtnExcelTool.Name = "BtnExcelTool";
-            BtnExcelTool.Size = new Size(200, 29);
+            BtnExcelTool.Size = new Size(236, 29);
             BtnExcelTool.TabIndex = 1;
             BtnExcelTool.Text = "Excel";
             BtnExcelTool.UseVisualStyleBackColor = true;
@@ -99,7 +99,7 @@
             BtnPdfTool.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             BtnPdfTool.Location = new Point(0, 0);
             BtnPdfTool.Name = "BtnPdfTool";
-            BtnPdfTool.Size = new Size(200, 35);
+            BtnPdfTool.Size = new Size(236, 35);
             BtnPdfTool.TabIndex = 0;
             BtnPdfTool.Text = "Renombrador de PDFs";
             BtnPdfTool.UseVisualStyleBackColor = true;
@@ -108,9 +108,9 @@
             // PnlMainContent
             // 
             PnlMainContent.Dock = DockStyle.Fill;
-            PnlMainContent.Location = new Point(200, 0);
+            PnlMainContent.Location = new Point(236, 0);
             PnlMainContent.Name = "PnlMainContent";
-            PnlMainContent.Size = new Size(1049, 603);
+            PnlMainContent.Size = new Size(1013, 603);
             PnlMainContent.TabIndex = 1;
             // 
             // MainForm
