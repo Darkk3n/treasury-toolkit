@@ -8,7 +8,7 @@ namespace TreasuryToolkit.Infra.Services
 {
     public class LocalFileScanner : IFileScanner
     {
-        public void ScanPdfFiles(string date, string[] files, Action<string> onProgress, Action<ScannedPaymentData> onRowExtracted)
+        public void ScanPdfFiles(string[] files, Action<string> onProgress, Action<ScannedPaymentData> onRowExtracted)
         {
             for (int i = 0; i < files.Length; i++)
             {
@@ -39,7 +39,8 @@ namespace TreasuryToolkit.Infra.Services
                             out string amount,
                             out string vendor,
                             out string concept,
-                            out string currency
+                            out string currency,
+                            out string date
                         );
 
                         onRowExtracted?.Invoke(new ScannedPaymentData
@@ -89,12 +90,13 @@ namespace TreasuryToolkit.Infra.Services
             return cleaned;
         }
 
-        private static void ExtractPdfDataPoints(string rawPdfText, out string amount, out string vendorName, out string reason, out string currency)
+        private static void ExtractPdfDataPoints(string rawPdfText, out string amount, out string vendorName, out string reason, out string currency, out string date)
         {
             amount = string.Empty;
             vendorName = string.Empty;
             reason = string.Empty;
             currency = string.Empty;
+            date = string.Empty;
 
             // --- 1. REAL AMOUNT EXTRACTION (Importe) ---
             // This pattern captures "Importe:", any spaces, and numbers formatted like 12,345.00
@@ -205,6 +207,17 @@ namespace TreasuryToolkit.Infra.Services
                 }
             }
             #endregion
+
+            // --- 4. DATE EXTRACTION ---
+            var datePattern = @"(?:Fecha\s+de\s+aplicación:)\s*(?<date>\d{2}/\d{2}/\d{4})";
+
+            Match dateMatch = Regex.Match(rawPdfText, datePattern, RegexOptions.IgnoreCase);
+            if (dateMatch.Success)
+            {
+                var rawDate = dateMatch.Groups[1].Value;
+                DateTime parsedDate = DateTime.ParseExact(rawDate, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                date = parsedDate.ToString("yyyyMMdd");
+            }
         }
     }
 }
