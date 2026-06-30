@@ -209,6 +209,7 @@ namespace TreasuryToolkit.Infra.Services
             #endregion
 
             // --- 4. DATE EXTRACTION ---
+            #region Date
             var datePattern = @"(?:Fecha\s+de\s+aplicación:)\s*(?<date>\d{2}/\d{2}/\d{4})";
 
             Match dateMatch = Regex.Match(rawPdfText, datePattern, RegexOptions.IgnoreCase);
@@ -217,7 +218,8 @@ namespace TreasuryToolkit.Infra.Services
                 var rawDate = dateMatch.Groups[1].Value;
                 DateTime parsedDate = DateTime.ParseExact(rawDate, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
                 date = parsedDate.ToString("yyyyMMdd");
-            }
+            } 
+            #endregion
         }
     }
 }
