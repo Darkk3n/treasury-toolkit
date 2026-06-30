@@ -117,4 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="label3.Text" xml:space="preserve">
+    <value>Una herramienta de automatización de alto rendimiento, con prioridad local, diseñada para optimizar las operaciones financieras, eliminar la fricción del procesamiento manual de documentos y garantizar el estricto cumplimiento de los datos en todos los flujos de trabajo corporativos.</value>
+  </data>
 </root>
