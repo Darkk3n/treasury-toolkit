@@ -44,12 +44,22 @@
             FlpRobustArch = new FlowLayoutPanel();
             label9 = new Label();
             label10 = new Label();
-            panel1 = new Panel();
+            PnlDevProfile = new Panel();
+            LnkEmail = new LinkLabel();
+            label17 = new Label();
+            LnkGitHub = new LinkLabel();
+            label16 = new Label();
+            label15 = new Label();
+            label14 = new Label();
+            label13 = new Label();
+            label12 = new Label();
+            label11 = new Label();
             FlpContainer.SuspendLayout();
             FlpPillars.SuspendLayout();
             FlpOpEfficiency.SuspendLayout();
             FlpDataSecPriv.SuspendLayout();
             FlpRobustArch.SuspendLayout();
+            PnlDevProfile.SuspendLayout();
             SuspendLayout();
             // 
             // FlpContainer
@@ -59,7 +69,7 @@
             FlpContainer.Controls.Add(label3);
             FlpContainer.Controls.Add(label4);
             FlpContainer.Controls.Add(FlpPillars);
-            FlpContainer.Controls.Add(panel1);
+            FlpContainer.Controls.Add(PnlDevProfile);
             FlpContainer.Dock = DockStyle.Fill;
             FlpContainer.FlowDirection = FlowDirection.TopDown;
             FlpContainer.Location = new Point(0, 0);
@@ -207,13 +217,110 @@
             label10.TabIndex = 1;
             label10.Text = "Desarrollado bajo estándares modernos de Microsoft .NET, asegurando un sistema estable y escalable.";
             // 
-            // panel1
+            // PnlDevProfile
             // 
-            panel1.Location = new Point(3, 317);
-            panel1.Margin = new Padding(3, 0, 3, 3);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(788, 117);
-            panel1.TabIndex = 4;
+            PnlDevProfile.Controls.Add(LnkEmail);
+            PnlDevProfile.Controls.Add(label17);
+            PnlDevProfile.Controls.Add(LnkGitHub);
+            PnlDevProfile.Controls.Add(label16);
+            PnlDevProfile.Controls.Add(label15);
+            PnlDevProfile.Controls.Add(label14);
+            PnlDevProfile.Controls.Add(label13);
+            PnlDevProfile.Controls.Add(label12);
+            PnlDevProfile.Controls.Add(label11);
+            PnlDevProfile.Font = new Font("Segoe UI", 10F);
+            PnlDevProfile.Location = new Point(3, 317);
+            PnlDevProfile.Margin = new Padding(3, 0, 3, 3);
+            PnlDevProfile.Name = "PnlDevProfile";
+            PnlDevProfile.Size = new Size(788, 168);
+            PnlDevProfile.TabIndex = 4;
+            // 
+            // LnkEmail
+            // 
+            LnkEmail.AutoSize = true;
+            LnkEmail.Location = new Point(153, 134);
+            LnkEmail.Name = "LnkEmail";
+            LnkEmail.Size = new Size(118, 19);
+            LnkEmail.TabIndex = 8;
+            LnkEmail.TabStop = true;
+            LnkEmail.Text = "correo electrónico";
+            LnkEmail.LinkClicked += LnkEmail_LinkClicked;
+            // 
+            // label17
+            // 
+            label17.AutoSize = true;
+            label17.Location = new Point(6, 134);
+            label17.Name = "label17";
+            label17.Size = new Size(153, 19);
+            label17.TabIndex = 7;
+            label17.Text = "o contacteme mediante";
+            // 
+            // LnkGitHub
+            // 
+            LnkGitHub.AutoSize = true;
+            LnkGitHub.Location = new Point(629, 115);
+            LnkGitHub.Name = "LnkGitHub";
+            LnkGitHub.Size = new Size(53, 19);
+            LnkGitHub.TabIndex = 6;
+            LnkGitHub.TabStop = true;
+            LnkGitHub.Text = "GitHub";
+            LnkGitHub.LinkClicked += LnkGitHub_LinkClicked;
+            // 
+            // label16
+            // 
+            label16.AutoSize = true;
+            label16.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label16.Location = new Point(6, 115);
+            label16.Name = "label16";
+            label16.Size = new Size(628, 17);
+            label16.TabIndex = 5;
+            label16.Text = "¿Requiere soluciones de automatización a la medida o consultoría técnica? Conozca más de mi trabajo en";
+            // 
+            // label15
+            // 
+            label15.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label15.Location = new Point(6, 54);
+            label15.Name = "label15";
+            label15.Size = new Size(779, 51);
+            label15.TabIndex = 4;
+            label15.Text = resources.GetString("label15.Text");
+            // 
+            // label14
+            // 
+            label14.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label14.Location = new Point(460, 31);
+            label14.Name = "label14";
+            label14.Size = new Size(318, 23);
+            label14.TabIndex = 3;
+            label14.Text = "Gerardo Aguilar (Desarrollador Senior Full-Stack)";
+            // 
+            // label13
+            // 
+            label13.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label13.Location = new Point(106, 30);
+            label13.Name = "label13";
+            label13.Size = new Size(359, 23);
+            label13.TabIndex = 2;
+            label13.Text = "fue diseñado, arquitectado e implementado desde cero por";
+            // 
+            // label12
+            // 
+            label12.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label12.Location = new Point(6, 30);
+            label12.Name = "label12";
+            label12.Size = new Size(106, 23);
+            label12.TabIndex = 1;
+            label12.Text = "TreasuryToolkit";
+            // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            label11.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label11.Location = new Point(6, 5);
+            label11.Name = "label11";
+            label11.Size = new Size(190, 21);
+            label11.TabIndex = 0;
+            label11.Text = "Liderazgo en Ingenieria";
             // 
             // UcAbout
             // 
@@ -231,6 +338,8 @@
             FlpDataSecPriv.PerformLayout();
             FlpRobustArch.ResumeLayout(false);
             FlpRobustArch.PerformLayout();
+            PnlDevProfile.ResumeLayout(false);
+            PnlDevProfile.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -251,6 +360,15 @@
         private Label label8;
         private Label label9;
         private Label label10;
-        private Panel panel1;
+        private Panel PnlDevProfile;
+        private Label label14;
+        private Label label13;
+        private Label label12;
+        private Label label11;
+        private Label label15;
+        private LinkLabel LnkGitHub;
+        private Label label16;
+        private Label label17;
+        private LinkLabel LnkEmail;
     }
 }

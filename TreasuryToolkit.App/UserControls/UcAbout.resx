@@ -120,4 +120,7 @@
   <data name="label3.Text" xml:space="preserve">
     <value>Una herramienta de automatización de alto rendimiento, con prioridad local, diseñada para optimizar las operaciones financieras, eliminar la fricción del procesamiento manual de documentos y garantizar el estricto cumplimiento de los datos en todos los flujos de trabajo corporativos.</value>
   </data>
+  <data name="label15.Text" xml:space="preserve">
+    <value>Especializado en ecosistemas empresariales modernos, arquitectura de software full-stack y pipelines de automatización operativa. Esta herramienta representa un compromiso con la excelencia técnica: construir soluciones robustas, confiables y de alto rendimiento que transforman problemas de negocio complejos en interfaces elegantes y funcionales.</value>
+  </data>
 </root>
