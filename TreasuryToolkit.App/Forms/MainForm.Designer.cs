@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             PnlSideBar = new Panel();
             ChkGlobalTheme = new CheckBox();
             BtnAbout = new Button();
@@ -122,6 +123,7 @@
             Controls.Add(PnlMainContent);
             Controls.Add(PnlSideBar);
             ForeColor = Color.White;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
