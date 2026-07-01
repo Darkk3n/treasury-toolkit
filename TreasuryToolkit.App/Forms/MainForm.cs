@@ -126,6 +126,12 @@ namespace TreasuryToolkit.App
                 excelView.ApplyTheme(_isDarkMode);
                 UpdateButtonHighlight(BtnExcelTool);
             }
+
+            else if (_currentView is UcAbout aboutView)
+            {
+                aboutView.ApplyTheme(_isDarkMode);
+                UpdateButtonHighlight(BtnAbout);
+            }
         }
 
         private void ShowView(UserControl view)
