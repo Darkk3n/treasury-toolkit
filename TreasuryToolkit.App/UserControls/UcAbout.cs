@@ -4,11 +4,14 @@ namespace TreasuryToolkit.App
 {
     public partial class UcAbout : UserControl
     {
+        #region Constructor
         public UcAbout()
         {
             InitializeComponent();
         }
+        #endregion
 
+        #region UI Controls Events
         private void LnkGitHub_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             Process.Start(new ProcessStartInfo
@@ -42,5 +45,45 @@ namespace TreasuryToolkit.App
                 );
             }
         }
+        #endregion
+
+        #region Helpers
+        public void ApplyTheme(bool isDarkMode)
+        {
+            Color controlBg = isDarkMode ? Color.FromArgb(45, 45, 48) : Color.White;
+            Color textColor = isDarkMode ? Color.White : Color.FromArgb(51, 51, 51);
+            Color linkColor = isDarkMode ? Color.FromArgb(0, 122, 204) : Color.FromKnownColor(KnownColor.HotTrack);
+            this.BackColor = isDarkMode ? Color.FromArgb(30, 30, 30) : Color.FromKnownColor(KnownColor.ControlLightLight);
+            ApplyThemeToAllControls(FlpContainer, controlBg, textColor, linkColor);
+        }
+
+        private static void ApplyThemeToAllControls(Control parent, Color controlBg, Color textColor, Color linkColor)
+        {
+            foreach (Control c in parent.Controls)
+            {
+                ChangeLabelAndLinkLabelColors(controlBg, textColor, linkColor, c);
+                if (c.HasChildren)
+                {
+                    ApplyThemeToAllControls(c, controlBg, textColor, linkColor);
+                }
+            }
+        }
+
+        private static void ChangeLabelAndLinkLabelColors(Color controlBg, Color textColor, Color linkColor, Control c)
+        {
+            if (c is Label lbl)
+            {
+                lbl.ForeColor = textColor;
+                lbl.BackColor = controlBg;
+            }
+            else if (c is LinkLabel lnk)
+            {
+                lnk.LinkColor = linkColor;
+                lnk.ActiveLinkColor = linkColor;
+                lnk.VisitedLinkColor = linkColor;
+                lnk.BackColor = controlBg;
+            }
+        } 
+        #endregion
     }
 }

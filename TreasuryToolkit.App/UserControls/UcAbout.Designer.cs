@@ -113,7 +113,8 @@
             // 
             label4.AutoSize = true;
             label4.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label4.Location = new Point(3, 116);
+            label4.Location = new Point(3, 126);
+            label4.Margin = new Padding(3, 10, 3, 0);
             label4.Name = "label4";
             label4.Size = new Size(241, 21);
             label4.TabIndex = 3;
@@ -124,7 +125,7 @@
             FlpPillars.Controls.Add(FlpOpEfficiency);
             FlpPillars.Controls.Add(FlpDataSecPriv);
             FlpPillars.Controls.Add(FlpRobustArch);
-            FlpPillars.Location = new Point(3, 147);
+            FlpPillars.Location = new Point(3, 157);
             FlpPillars.Margin = new Padding(3, 10, 3, 3);
             FlpPillars.Name = "FlpPillars";
             FlpPillars.Size = new Size(788, 167);
@@ -229,7 +230,7 @@
             PnlDevProfile.Controls.Add(label12);
             PnlDevProfile.Controls.Add(label11);
             PnlDevProfile.Font = new Font("Segoe UI", 10F);
-            PnlDevProfile.Location = new Point(3, 317);
+            PnlDevProfile.Location = new Point(3, 327);
             PnlDevProfile.Margin = new Padding(3, 0, 3, 3);
             PnlDevProfile.Name = "PnlDevProfile";
             PnlDevProfile.Size = new Size(788, 168);
