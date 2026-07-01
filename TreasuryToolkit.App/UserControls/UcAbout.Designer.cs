@@ -30,20 +30,21 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UcAbout));
             FlpContainer = new FlowLayoutPanel();
-            FlpPillars = new FlowLayoutPanel();
             label1 = new Label();
             label2 = new Label();
             label3 = new Label();
-            FlpOpEfficiency = new FlowLayoutPanel();
             label4 = new Label();
+            FlpPillars = new FlowLayoutPanel();
+            FlpOpEfficiency = new FlowLayoutPanel();
             label5 = new Label();
             label6 = new Label();
             FlpDataSecPriv = new FlowLayoutPanel();
-            FlpRobustArch = new FlowLayoutPanel();
             label7 = new Label();
             label8 = new Label();
+            FlpRobustArch = new FlowLayoutPanel();
             label9 = new Label();
             label10 = new Label();
+            panel1 = new Panel();
             FlpContainer.SuspendLayout();
             FlpPillars.SuspendLayout();
             FlpOpEfficiency.SuspendLayout();
@@ -58,6 +59,7 @@
             FlpContainer.Controls.Add(label3);
             FlpContainer.Controls.Add(label4);
             FlpContainer.Controls.Add(FlpPillars);
+            FlpContainer.Controls.Add(panel1);
             FlpContainer.Dock = DockStyle.Fill;
             FlpContainer.FlowDirection = FlowDirection.TopDown;
             FlpContainer.Location = new Point(0, 0);
@@ -65,17 +67,6 @@
             FlpContainer.Size = new Size(794, 536);
             FlpContainer.TabIndex = 0;
             FlpContainer.WrapContents = false;
-            // 
-            // FlpPillars
-            // 
-            FlpPillars.Controls.Add(FlpOpEfficiency);
-            FlpPillars.Controls.Add(FlpDataSecPriv);
-            FlpPillars.Controls.Add(FlpRobustArch);
-            FlpPillars.Location = new Point(3, 147);
-            FlpPillars.Margin = new Padding(3, 10, 3, 3);
-            FlpPillars.Name = "FlpPillars";
-            FlpPillars.Size = new Size(788, 167);
-            FlpPillars.TabIndex = 0;
             // 
             // label1
             // 
@@ -108,15 +99,6 @@
             label3.TabIndex = 2;
             label3.Text = resources.GetString("label3.Text");
             // 
-            // FlpOpEfficiency
-            // 
-            FlpOpEfficiency.Controls.Add(label5);
-            FlpOpEfficiency.Controls.Add(label6);
-            FlpOpEfficiency.Location = new Point(3, 3);
-            FlpOpEfficiency.Name = "FlpOpEfficiency";
-            FlpOpEfficiency.Size = new Size(785, 65);
-            FlpOpEfficiency.TabIndex = 0;
-            // 
             // label4
             // 
             label4.AutoSize = true;
@@ -126,6 +108,26 @@
             label4.Size = new Size(241, 21);
             label4.TabIndex = 3;
             label4.Text = "Impacto y Pilares de Ingeniera";
+            // 
+            // FlpPillars
+            // 
+            FlpPillars.Controls.Add(FlpOpEfficiency);
+            FlpPillars.Controls.Add(FlpDataSecPriv);
+            FlpPillars.Controls.Add(FlpRobustArch);
+            FlpPillars.Location = new Point(3, 147);
+            FlpPillars.Margin = new Padding(3, 10, 3, 3);
+            FlpPillars.Name = "FlpPillars";
+            FlpPillars.Size = new Size(788, 167);
+            FlpPillars.TabIndex = 0;
+            // 
+            // FlpOpEfficiency
+            // 
+            FlpOpEfficiency.Controls.Add(label5);
+            FlpOpEfficiency.Controls.Add(label6);
+            FlpOpEfficiency.Location = new Point(3, 3);
+            FlpOpEfficiency.Name = "FlpOpEfficiency";
+            FlpOpEfficiency.Size = new Size(785, 65);
+            FlpOpEfficiency.TabIndex = 0;
             // 
             // label5
             // 
@@ -156,15 +158,6 @@
             FlpDataSecPriv.Size = new Size(785, 35);
             FlpDataSecPriv.TabIndex = 1;
             // 
-            // FlpRobustArch
-            // 
-            FlpRobustArch.Controls.Add(label9);
-            FlpRobustArch.Controls.Add(label10);
-            FlpRobustArch.Location = new Point(3, 115);
-            FlpRobustArch.Name = "FlpRobustArch";
-            FlpRobustArch.Size = new Size(785, 51);
-            FlpRobustArch.TabIndex = 2;
-            // 
             // label7
             // 
             label7.AutoSize = true;
@@ -185,6 +178,15 @@
             label8.TabIndex = 1;
             label8.Text = "Arquitectura de ejecución local que garantiza el cumplimiento estricto de manejo de datos.";
             // 
+            // FlpRobustArch
+            // 
+            FlpRobustArch.Controls.Add(label9);
+            FlpRobustArch.Controls.Add(label10);
+            FlpRobustArch.Location = new Point(3, 115);
+            FlpRobustArch.Name = "FlpRobustArch";
+            FlpRobustArch.Size = new Size(785, 51);
+            FlpRobustArch.TabIndex = 2;
+            // 
             // label9
             // 
             label9.AutoSize = true;
@@ -204,6 +206,14 @@
             label10.Size = new Size(616, 17);
             label10.TabIndex = 1;
             label10.Text = "Desarrollado bajo estándares modernos de Microsoft .NET, asegurando un sistema estable y escalable.";
+            // 
+            // panel1
+            // 
+            panel1.Location = new Point(3, 317);
+            panel1.Margin = new Padding(3, 0, 3, 3);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(788, 117);
+            panel1.TabIndex = 4;
             // 
             // UcAbout
             // 
@@ -241,5 +251,6 @@
         private Label label8;
         private Label label9;
         private Label label10;
+        private Panel panel1;
     }
 }
