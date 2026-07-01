@@ -9,6 +9,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	<ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
 	<ApplicationHighDpiMode>DpiUnawareGdiScaled</ApplicationHighDpiMode>
+	<ApplicationIcon>Icon3.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +20,7 @@
     <Content Include="Data\companies.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Icon3.ico" />
   </ItemGroup>
 
   <ItemGroup>
