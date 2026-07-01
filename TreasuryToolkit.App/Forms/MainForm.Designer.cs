@@ -76,6 +76,7 @@
             BtnAbout.TabIndex = 2;
             BtnAbout.Text = "Acerca De";
             BtnAbout.UseVisualStyleBackColor = true;
+            BtnAbout.Click += BtnAbout_Click;
             // 
             // BtnExcelTool
             // 

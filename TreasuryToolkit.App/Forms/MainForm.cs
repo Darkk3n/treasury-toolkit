@@ -11,6 +11,7 @@ namespace TreasuryToolkit.App
         private UserControl _currentView;
         private UcFileRenamer _fileRenamer;
         private UcExcelWorkflowAutomator _excelWorkflowAutomator;
+        private UcAbout _about;
         private readonly Func<ProgressForm> progressFormFactory;
         private readonly IPdfProcessor pdfProcessor;
         private readonly IFileScanner fileScanner;
@@ -53,6 +54,12 @@ namespace TreasuryToolkit.App
         {
             ShowView(_excelWorkflowAutomator);
             UpdateButtonHighlight(BtnExcelTool);
+        }
+
+        private void BtnAbout_Click(object sender, EventArgs e)
+        {
+            ShowView(_about);
+            UpdateButtonHighlight(BtnAbout);
         }
         #endregion
 
@@ -119,6 +126,12 @@ namespace TreasuryToolkit.App
                 excelView.ApplyTheme(_isDarkMode);
                 UpdateButtonHighlight(BtnExcelTool);
             }
+
+            else if (_currentView is UcAbout aboutView)
+            {
+                aboutView.ApplyTheme(_isDarkMode);
+                UpdateButtonHighlight(BtnAbout);
+            }
         }
 
         private void ShowView(UserControl view)
@@ -138,6 +151,10 @@ namespace TreasuryToolkit.App
                 Dock = DockStyle.Fill
             };
             _excelWorkflowAutomator = new UcExcelWorkflowAutomator()
+            {
+                Dock = DockStyle.Fill
+            };
+            _about = new UcAbout()
             {
                 Dock = DockStyle.Fill
             };
