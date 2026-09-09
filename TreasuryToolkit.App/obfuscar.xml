@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Obfuscator>
-  <!-- Point InPath to where dotnet publish wrote the files -->
-  <Var Name="InPath" Value="../publish" />
-  <Var Name="OutPath" Value="../publish/obfuscated" />
+  <Var Name="InPath" Value="../staging" />
+  <Var Name="OutPath" Value="../staging/obfuscated" />
 
   <Var Name="ReuseNames" Value="true" />
   <Var Name="HidePrivateApi" Value="true" />
@@ -10,8 +9,8 @@
   <Var Name="Optimize" Value="true" />
   <Var Name="SuppressIldasm" Value="true" />
 
-  <!-- Tell Obfuscar to search the publish directory for dependencies -->
-  <Var Name="AssemblySearchPath" Value="../publish" />
+  <Var Name="AssemblySearchPath" Value="../staging" />
 
-  <Module Name="$(InPath)\TreasuryToolkit.App.dll" />
+  <!-- Updated to match AssemblyName -->
+  <Module Name="$(InPath)\TreasuryToolkit.dll" />
 </Obfuscator>
