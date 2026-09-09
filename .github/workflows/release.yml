@@ -38,7 +38,9 @@ jobs:
 
     # Step 6: Obfuscate the staged assemblies
     - name: Run Obfuscation
-      run: obfuscar.console TreasuryToolkit.App/obfuscar.xml
+      run: |
+        cd TreasuryToolkit.App
+        obfuscar.console obfuscar.xml
 
     # Step 7: Overwrite staged assembly with obfuscated version and bundle into single .exe
     - name: Compile Single Executable Suite
