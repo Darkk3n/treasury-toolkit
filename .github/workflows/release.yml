@@ -37,10 +37,10 @@ jobs:
         dotnet publish TreasuryToolkit.App/TreasuryToolkit.App.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=false -o ./staging
 
     # Step 6: Obfuscate the staged assemblies
-    - name: Run Obfuscation
-      run: |
-        cd TreasuryToolkit.App
-        obfuscar.console obfuscar.xml
+    #- name: Run Obfuscation
+     # run: |
+      #  cd TreasuryToolkit.App
+       # obfuscar.console obfuscar.xml
 
     # Step 7: Overwrite staged assembly with obfuscated version and bundle into single .exe
     - name: Compile Single Executable Suite
