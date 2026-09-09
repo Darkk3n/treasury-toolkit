@@ -60,7 +60,7 @@
 	</ItemGroup>
 
 	<Target Name="Obfuscate" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
-		<Exec Command="$(Obfuscar) obfuscar.xml" />
-	</Target>
+  <Exec Command="$(Obfuscar) obfuscar.xml" WorkingDirectory="$(TargetDir)" />
+</Target>
 
 </Project>
