@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <Obfuscator>
   <Var Name="InPath" Value="." />
   <Var Name="OutPath" Value=".\Obfuscated" />
@@ -7,9 +7,7 @@
   <Var Name="HidePrivateApi" Value="true" />
   <Var Name="KeepPublicApi" Value="false" />
   <Var Name="Optimize" Value="true" />
+  <Var Name="SuppressIldasm" Value="true" />
 
-  <!-- Target the DLLs containing the compiled IL code -->
-  <Module Name="$(InPath)\TreasuryToolkit.App.dll" />
-  <Module Name="$(InPath)\TreasuryToolkit.Core.dll" />
-  <Module Name="$(InPath)\TreasuryToolkit.Infra.dll" />
+  <Module Name="TreasuryToolkit.App.dll" />
 </Obfuscator>
