@@ -59,8 +59,9 @@
 		</None>
 	</ItemGroup>
 
-	<Target Name="Obfuscate" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
-  <Exec Command="$(Obfuscar) obfuscar.xml" WorkingDirectory="$(TargetDir)" />
+<Target Name="Obfuscate" BeforeTargets="GenerateSingleFileBundle" Condition="'$(Configuration)' == 'Release'">
+  <Message Text="Running Obfuscar on staged binaries..." Importance="high" />
+  <Exec Command="$(Obfuscar) obfuscar.xml" WorkingDirectory="$(PublishDir)" IgnoreExitCode="false" />
 </Target>
 
 </Project>
