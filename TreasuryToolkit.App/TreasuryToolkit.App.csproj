@@ -10,6 +10,8 @@
 		<ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
 		<ApplicationHighDpiMode>DpiUnawareGdiScaled</ApplicationHighDpiMode>
 		<ApplicationIcon>Icon3.ico</ApplicationIcon>
+		<AssemblyName>TreasuryToolkit</AssemblyName>
+		<AssemblyTitle>TreasuryToolkit</AssemblyTitle>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -56,12 +58,13 @@
 	<ItemGroup>
 		<None Update="obfuscar.xml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</None>
 	</ItemGroup>
 
-<Target Name="Obfuscate" BeforeTargets="GenerateSingleFileBundle" Condition="'$(Configuration)' == 'Release'">
-  <Message Text="Running Obfuscar on staged binaries..." Importance="high" />
-  <Exec Command="$(Obfuscar) obfuscar.xml" WorkingDirectory="$(PublishDir)" IgnoreExitCode="false" />
-</Target>
+	<Target Name="Obfuscate" BeforeTargets="GenerateSingleFileBundle" Condition="'$(Configuration)' == 'Release'">
+		<Message Text="Running Obfuscar on staged binaries..." Importance="high" />
+		<Exec Command="$(Obfuscar) &quot;$(MSBuildProjectDirectory)\obfuscar.xml&quot;" WorkingDirectory="$(PublishDir)" IgnoreExitCode="false" />
+	</Target>
 
 </Project>
