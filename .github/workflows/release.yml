@@ -28,9 +28,6 @@ jobs:
 
     # Step 4: 🚀 YOUR MAGIC PUBLISH COMMAND 🚀
     # Point this to the path of your main WinForms .csproj file
-    - name: Compile Single Executable Suite
-      run: |
-        dotnet publish TreasuryToolkit.App/TreasuryToolkit.App.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true -o ./publish
 
     - name: Install Obfuscar Tool
       run: dotnet tool install --global Obfuscar.GlobalTool
@@ -38,6 +35,10 @@ jobs:
     - name: Run Obfuscation
       run: obfuscar.console TreasuryToolkit.App/obfuscar.xml
       
+    - name: Compile Single Executable Suite
+      run: |
+        dotnet publish TreasuryToolkit.App/TreasuryToolkit.App.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true -o ./publish
+        
     # Step 4.5: 🔏 CODE SIGN THE PUBLISHED EXECUTABLE 🔏        
     - name: Code Sign Executable
       uses: dlemstra/code-sign-action@v1
