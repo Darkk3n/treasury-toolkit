@@ -1,19 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Obfuscator>
-	<!-- Directory where your built binaries live -->
-	<Var Name="InPath" Value="." />
-	<!-- Output directory for obfuscated binaries before single-file bundling -->
-	<Var Name="OutPath" Value=".\Obfuscated" />
+  <Var Name="InPath" Value="." />
+  <Var Name="OutPath" Value=".\Obfuscated" />
 
-	<Var Name="ReuseNames" Value="true" />
-	<Var Name="HidePrivateApi" Value="true" />
-	<Var Name="KeepPublicApi" Value="false" />
-	<Var Name="Optimize" Value="true" />
+  <Var Name="ReuseNames" Value="true" />
+  <Var Name="HidePrivateApi" Value="true" />
+  <Var Name="KeepPublicApi" Value="false" />
+  <Var Name="Optimize" Value="true" />
 
-	<!-- Your main EXE -->
-	<Module Name="$(InPath)\TreasuryToolkit.App.exe" />
-
-	<!-- If you have a separate class library for your core logic -->
-	<Module Name="$(InPath)\TreasuryToolkit.Core.dll" />
-	<Module Name="$(InPath)\TreasuryToolkit.Infra.dll" />
+  <!-- Target the DLLs containing the compiled IL code -->
+  <Module Name="$(InPath)\TreasuryToolkit.App.dll" />
+  <Module Name="$(InPath)\TreasuryToolkit.Core.dll" />
+  <Module Name="$(InPath)\TreasuryToolkit.Infra.dll" />
 </Obfuscator>
