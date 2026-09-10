@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Obfuscator>
 	<Var name="InPath" value="." />
-	<Var name="OutPath" value="." />
+	<Var name="OutPath" value="obfuscated" />
 
 	<Var name="ReuseNames" value="true" />
 	<Var name="HidePrivateApi" value="true" />

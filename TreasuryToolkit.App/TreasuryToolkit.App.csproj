@@ -57,7 +57,12 @@
 
 	<Target Name="ObfuscateAssemblies" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
 		<Message Text="=== RUNNING OBFUSCAR IN MSBUILD CONTEXT ===" Importance="high" />
+		<!-- Obfuscar cannot use the same path for InPath and OutPath (it still holds the input
+		     file open while writing output), so it writes to a scratch subfolder here and we
+		     copy the obfuscated assembly back over the original build output afterward. -->
 		<Exec Command="$(Obfuscar) &quot;$(MSBuildProjectDirectory)\obfuscar.xml&quot;" WorkingDirectory="$(TargetDir)" />
+		<Copy SourceFiles="$(TargetDir)obfuscated\TreasuryToolkit.dll" DestinationFolder="$(TargetDir)" />
+		<RemoveDir Directories="$(TargetDir)obfuscated" />
 	</Target>
 
 	<ItemGroup>
