@@ -39,7 +39,8 @@ namespace TreasuryToolkit.Infra.Services
                 var comment = string.Join("_", (row.Comment ?? string.Empty).Split(Path.GetInvalidFileNameChars())).Trim();
 
                 string directory = Path.GetDirectoryName(currentFilePath);
-                string newFileName = $"{row.Date}-{companyName}-{vendor}-{concept}-{amount} {currency}";
+                var cleanVendor = vendor.HasValue ? $"{vendor}-" : string.Empty;
+                string newFileName = $"{row.Date}-{companyName}-{cleanVendor}{concept}-{amount} {currency}";
                 if (comment.HasValue)
                 {
                     newFileName += $" ({comment})";
