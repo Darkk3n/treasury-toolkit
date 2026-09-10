@@ -63,8 +63,17 @@
 		<Exec Command="$(Obfuscar) &quot;$(MSBuildProjectDirectory)\obfuscar.xml&quot;" WorkingDirectory="$(TargetDir)" />
 		<ItemGroup>
 			<ObfuscatedAssemblies Include="$(TargetDir)obfuscated\*.dll" />
+			<!-- dotnet publish resolves ProjectReference outputs (Core.dll, Infra.dll) from
+			     those projects' own bin folders via ReferenceCopyLocalPaths, not from this
+			     project's TargetDir copy — so overwriting TargetDir alone leaves the published
+			     Core/Infra assemblies unobfuscated even though this project's own primary
+			     assembly comes out obfuscated correctly. Overwrite their original build
+			     outputs too, so every publish invocation (including the later no-build one)
+			     picks up the obfuscated bytes. -->
+			<ReferencedProjectOutputs Include="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'TreasuryToolkit.Core' Or '%(Filename)' == 'TreasuryToolkit.Infra'" />
 		</ItemGroup>
 		<Copy SourceFiles="@(ObfuscatedAssemblies)" DestinationFolder="$(TargetDir)" />
+		<Copy SourceFiles="$(TargetDir)obfuscated\%(ReferencedProjectOutputs.Filename)%(ReferencedProjectOutputs.Extension)" DestinationFiles="@(ReferencedProjectOutputs)" />
 		<RemoveDir Directories="$(TargetDir)obfuscated" />
 	</Target>
 
