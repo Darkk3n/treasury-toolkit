@@ -55,6 +55,11 @@
 		</EmbeddedResource>
 	</ItemGroup>
 
+	<Target Name="ObfuscateAssemblies" AfterTargets="Compile" Condition="'$(Configuration)' == 'Release'">
+		<Message Text="=== RUNNING OBFUSCAR IN MSBUILD CONTEXT ===" Importance="high" />
+		<Exec Command="$(Obfuscar) &quot;$(MSBuildProjectDirectory)\obfuscar.xml&quot;" WorkingDirectory="$(TargetDir)" />
+	</Target>
+
 	<ItemGroup>
 		<None Update="obfuscar.xml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
