@@ -30,7 +30,7 @@ directly). There is no test project in the solution.
     artifacts (words split across whitespace, merged fields).
   - `TextPdfProcessor` (`IPdfProcessor`): takes the (possibly user-edited) rows plus the original files and
     writes one single-page PDF per row, named `{Date}-{Company}-{Vendor}-{Concept}-{Amount} {Currency}.pdf`.
-    Some companies (currently `EMKA`, `KLEIBERIT`) have password/permission-restricted PDFs and require a
+    Some companies have password/permission-restricted PDFs and require a
     page-to-canvas redraw workaround (`SliceSecuredPage`) instead of a direct page copy. Source files are
     deleted only once every page has been consumed. This project depends on `iText`.
   - `JsonCompanyService` (`ICompanyService`): loads the company list from the embedded resource
