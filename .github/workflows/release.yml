@@ -28,12 +28,15 @@ jobs:
       run: dotnet restore
 
     # Step 4: Build + stage raw assemblies. Obfuscation runs automatically here via the
-    # ObfuscateAssemblies MSBuild target (TreasuryToolkit.App.csproj, AfterTargets="Compile",
-    # Configuration=Release) which invokes Obfuscar in-place against $(TargetDir) using
+    # ObfuscateAssemblies MSBuild target (TreasuryToolkit.App.csproj, AfterTargets="Build",
+    # Configuration=Release) which invokes Obfuscar against $(TargetDir) using
     # TreasuryToolkit.App/obfuscar.xml before these files get copied to ./staging.
+    # PublishReadyToRun=true must be passed here too (not just on the --no-build publish below)
+    # so this step's restore resolves the win-x64 crossgen2 package; --no-build implies
+    # --no-restore, so the later step can't fetch it on its own (NETSDK1094 otherwise).
     - name: Stage Unbundled Binaries
       run: |
-        dotnet publish TreasuryToolkit.App/TreasuryToolkit.App.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=false -o ./staging
+        dotnet publish TreasuryToolkit.App/TreasuryToolkit.App.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=false /p:PublishReadyToRun=true -o ./staging
 
     # Step 5: Bundle the already-obfuscated build output into a single .exe (--no-build reuses
     # the output from the step above, so it does not re-run Compile/obfuscation).
