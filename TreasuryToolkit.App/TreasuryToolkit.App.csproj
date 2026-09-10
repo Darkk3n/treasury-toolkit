@@ -69,8 +69,11 @@
 			     Core/Infra assemblies unobfuscated even though this project's own primary
 			     assembly comes out obfuscated correctly. Overwrite their original build
 			     outputs too, so every publish invocation (including the later no-build one)
-			     picks up the obfuscated bytes. -->
-			<ReferencedProjectOutputs Include="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'TreasuryToolkit.Core' Or '%(Filename)' == 'TreasuryToolkit.Infra'" />
+			     picks up the obfuscated bytes. ReferenceCopyLocalPaths carries both the .dll
+			     and the matching .pdb per project reference (same Filename metadata), but
+			     Obfuscar's obfuscated\ folder only ever contains .dll files — restrict to
+			     those or the .pdb copy below fails with "file not found". -->
+			<ReferencedProjectOutputs Include="@(ReferenceCopyLocalPaths)" Condition="('%(Filename)' == 'TreasuryToolkit.Core' Or '%(Filename)' == 'TreasuryToolkit.Infra') And '%(Extension)' == '.dll'" />
 		</ItemGroup>
 		<Copy SourceFiles="@(ObfuscatedAssemblies)" DestinationFolder="$(TargetDir)" />
 		<Copy SourceFiles="$(TargetDir)obfuscated\%(ReferencedProjectOutputs.Filename)%(ReferencedProjectOutputs.Extension)" DestinationFiles="@(ReferencedProjectOutputs)" />
