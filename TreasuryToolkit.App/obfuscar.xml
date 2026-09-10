@@ -9,5 +9,14 @@
 	<Var name="OptimizeMethods" value="true" />
 	<Var name="SuppressIldasm" value="true" />
 
-	<Module file="$(InPath)\TreasuryToolkit.dll" />
+	<Module file="$(InPath)\TreasuryToolkit.Core.dll">
+		<!-- Read by name via WinForms DisplayMember/ValueMember reflection (UcFileRenamer)
+		     and System.Text.Json property matching (JsonCompanyService) -->
+		<SkipProperty type="TreasuryToolkit.Core.Models.CompanyModel" name="*" />
+	</Module>
+	<Module file="$(InPath)\TreasuryToolkit.Infra.dll" />
+	<Module file="$(InPath)\TreasuryToolkit.dll">
+		<!-- Read by name via System.Text.Json property matching (MainForm settings load/save) -->
+		<SkipProperty type="TreasuryToolkit.App.LocalAppSettings" name="*" />
+	</Module>
 </Obfuscator>
