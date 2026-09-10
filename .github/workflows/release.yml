@@ -27,28 +27,21 @@ jobs:
     - name: Restore Dependencies
       run: dotnet restore
 
-    # Step 4: Install Obfuscar global tool
-    - name: Install Obfuscar Tool
-      run: dotnet tool install --global Obfuscar.GlobalTool
-
-    # Step 5: Stage raw assemblies for obfuscation (loose DLLs)
+    # Step 4: Build + stage raw assemblies. Obfuscation runs automatically here via the
+    # ObfuscateAssemblies MSBuild target (TreasuryToolkit.App.csproj, AfterTargets="Compile",
+    # Configuration=Release) which invokes Obfuscar in-place against $(TargetDir) using
+    # TreasuryToolkit.App/obfuscar.xml before these files get copied to ./staging.
     - name: Stage Unbundled Binaries
       run: |
         dotnet publish TreasuryToolkit.App/TreasuryToolkit.App.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=false -o ./staging
 
-    # Step 6: Obfuscate the staged assemblies
-    #- name: Run Obfuscation
-     # run: |
-      #  cd TreasuryToolkit.App
-       # obfuscar.console obfuscar.xml
-
-    # Step 7: Overwrite staged assembly with obfuscated version and bundle into single .exe
+    # Step 5: Bundle the already-obfuscated build output into a single .exe (--no-build reuses
+    # the output from the step above, so it does not re-run Compile/obfuscation).
     - name: Compile Single Executable Suite
       run: |
-        copy /Y staging\obfuscated\TreasuryToolkit.dll staging\TreasuryToolkit.dll
         dotnet publish TreasuryToolkit.App/TreasuryToolkit.App.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true --no-build -o ./publish
 
-    # Step 8: 🔏 CODE SIGN THE PUBLISHED EXECUTABLE 🔏        
+    # Step 6: 🔏 CODE SIGN THE PUBLISHED EXECUTABLE 🔏
     - name: Code Sign Executable
       uses: dlemstra/code-sign-action@v1
       with:
@@ -57,7 +50,7 @@ jobs:
         folder: './publish'
         files: 'TreasuryToolkit.exe'
 
-    # Step 9: Automatically create a GitHub Release and upload the solitary .exe file
+    # Step 7: Automatically create a GitHub Release and upload the solitary .exe file
     - name: Create GitHub Release
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v2

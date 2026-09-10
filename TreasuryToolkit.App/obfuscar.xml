@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Obfuscator>
-  <Var Name="InPath" Value="../staging" />
-  <Var Name="OutPath" Value="../staging/obfuscated" />
+	<Var name="InPath" value="." />
+	<Var name="OutPath" value="." />
 
-  <Var Name="ReuseNames" Value="true" />
-  <Var Name="HidePrivateApi" Value="true" />
-  <Var Name="KeepPublicApi" Value="false" />
-  <Var Name="Optimize" Value="true" />
-  <Var Name="SuppressIldasm" Value="true" />
+	<Var name="ReuseNames" value="true" />
+	<Var name="HidePrivateApi" value="true" />
+	<Var name="KeepPublicApi" value="false" />
+	<Var name="OptimizeMethods" value="true" />
+	<Var name="SuppressIldasm" value="true" />
 
-  <Var Name="AssemblySearchPath" Value="../staging" />
-
-  <!-- Updated to match AssemblyName -->
-  <Module Name="$(InPath)\TreasuryToolkit.dll" />
+	<Module file="$(InPath)\TreasuryToolkit.dll" />
 </Obfuscator>
