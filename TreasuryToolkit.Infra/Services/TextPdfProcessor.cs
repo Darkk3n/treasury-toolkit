@@ -40,7 +40,8 @@ namespace TreasuryToolkit.Infra.Services
 
                 string directory = Path.GetDirectoryName(currentFilePath);
                 var cleanVendor = vendor.HasValue ? $"{vendor}-" : string.Empty;
-                string newFileName = $"{row.Date}-{companyName}-{cleanVendor}{concept}-{amount} {currency}";
+                var cleanConcept = concept.HasValue ? $"{concept}-" : string.Empty;
+                string newFileName = $"{row.Date}-{companyName}-{cleanVendor}{cleanConcept}{amount} {currency}";
                 if (comment.HasValue)
                 {
                     newFileName += $" ({comment})";
