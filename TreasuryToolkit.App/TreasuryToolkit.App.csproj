@@ -55,7 +55,16 @@
 		</EmbeddedResource>
 	</ItemGroup>
 
-	<Target Name="ObfuscateAssemblies" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+	<!-- Obfuscation is disabled by default: it has repeatedly produced release builds that crash
+	     on launch with a System.TypeLoadException out of Program.ConfigureServices, caused by the
+	     obfuscated Core/Infra/App assemblies ending up with inconsistent renamed members across
+	     assembly boundaries. Re-enable only after fixing that root cause AND smoke-testing the
+	     actual published exe on Windows (not just confirming the pipeline runs without error). -->
+	<PropertyGroup>
+		<EnableObfuscation Condition="'$(EnableObfuscation)' == ''">false</EnableObfuscation>
+	</PropertyGroup>
+
+	<Target Name="ObfuscateAssemblies" AfterTargets="Build" Condition="'$(Configuration)' == 'Release' And '$(EnableObfuscation)' == 'true'">
 		<Message Text="=== RUNNING OBFUSCAR IN MSBUILD CONTEXT ===" Importance="high" />
 		<!-- Obfuscar cannot use the same path for InPath and OutPath (it still holds the input
 		     file open while writing output), so it writes to a scratch subfolder here and we
