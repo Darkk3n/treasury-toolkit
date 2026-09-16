@@ -62,8 +62,8 @@ namespace TreasuryToolkit.Infra.Services
 
                     using (PdfWriter writer = new(safeDestinationPath))
                     using (PdfDocument newSinglePagePdf = new(writer))
-                    {                      
-                        if (companyName.In("EMKA", "KLEIBERIT"))
+                    {
+                        if (SpecialLogicCompanies.Contains(companyName))
                         {
                             SliceSecuredPage(sourcePdfDoc, newSinglePagePdf, internalPageTracker);
                         }
@@ -160,5 +160,7 @@ namespace TreasuryToolkit.Infra.Services
             }
             return uniqueFilePath;
         }
+
+        private static List<string> SpecialLogicCompanies => ["EMKA", "KLEIBERIT", "DAP", "ELWEMA", "EUROPCELL", "HENN", "REINHAUSEN", "STOROPACK", "RUTRONIK"];
     }
 }
