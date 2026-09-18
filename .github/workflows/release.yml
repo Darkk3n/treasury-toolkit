@@ -53,11 +53,18 @@ jobs:
         folder: './publish'
         files: 'TreasuryToolkit.exe'
 
-    # Step 7: Automatically create a GitHub Release and upload the solitary .exe file
+    # Step 7: Zip the signed exe. Edge's SmartScreen download-reputation check ("isn't commonly
+    # downloaded") targets directly-executable extensions like .exe; shipping a .zip avoids that
+    # in-browser warning. (The OS-level SmartScreen prompt on first run is separate and untouched
+    # by this - it still checks the exe's own cert/file reputation when the user runs it.)
+    - name: Zip Release Asset
+      run: Compress-Archive -Path ./publish/TreasuryToolkit.exe -DestinationPath ./publish/TreasuryToolkit.zip
+
+    # Step 8: Automatically create a GitHub Release and upload the zipped .exe file
     - name: Create GitHub Release
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v2
       with:
-        files: ./publish/TreasuryToolkit.exe
+        files: ./publish/TreasuryToolkit.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
