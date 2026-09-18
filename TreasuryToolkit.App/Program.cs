@@ -12,6 +12,12 @@ namespace TreasuryToolkit.App
         [STAThread]
         static void Main()
         {
+            // iText discovers itext.font_asian.dll (CJK CMaps, e.g. UniGB-UTF16-H) by scanning
+            // loose *.dll files next to the exe (see ResourceUtil.LoadITextResourceAssemblies).
+            // In the single-file publish used for releases there's no loose file to find, so CJK
+            // PDFs fail to parse in Prod only. Force-loading it here puts it in the AppDomain
+            // before any PDF is touched, which iText's resource lookup also checks.
+            System.Reflection.Assembly.Load("itext.font_asian");
             ApplicationConfiguration.Initialize();
 
             var serviceCollection = new ServiceCollection();
