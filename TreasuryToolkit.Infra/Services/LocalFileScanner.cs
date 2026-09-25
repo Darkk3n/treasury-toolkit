@@ -102,7 +102,7 @@ namespace TreasuryToolkit.Infra.Services
             // This pattern captures "Importe:", any spaces, and numbers formatted like 12,345.00
             // The \. ensures it looks for a literal period right before the cents
             #region Amount
-            string amountPattern = @"(?:Importe(?:\s+a\s+enviar)?|Monto):\s*(?:\$\s*)?([0-9]{1,3}(?:,[0-9]{3})*\.[0-9]{2}|[0-9]+\.[0-9]{2})";
+            string amountPattern = @"(?:Importe(?:\s+a\s+enviar|\s+de\s+la\s+operaci[ó]n)?|Monto):\s*(?:\$\s*)?([0-9]{1,3}(?:,[0-9]{3})*\.[0-9]{2}|[0-9]+\.[0-9]{2})";
 
             Match amountMatch = Regex.Match(rawPdfText, amountPattern, RegexOptions.IgnoreCase);
             if (amountMatch.Success)
@@ -117,7 +117,7 @@ namespace TreasuryToolkit.Infra.Services
             #region Reason
             Match reasonMatch = Regex.Match(
                 rawPdfText,
-                @"(?:Motivo(?:\s+de\s+pago)?|Concepto(?:\s+de\s+pago)?|Concepto\s+CIE|Detalle\s+de\s+pago|Referencia\s+del\s+Beneficiario):\s*([^\r\n]+)",
+                @"(?<!\bdel\s)(?:Motivo(?:\s+de\s+pago)?|Concepto(?:\s+de\s+pago)?|Concepto\s+CIE|Detalle\s+de\s+pago|Referencia\s+del\s+Beneficiario):\s*([^\r\n]+)",
                 RegexOptions.IgnoreCase);
 
             if (reasonMatch.Success)
@@ -190,6 +190,25 @@ namespace TreasuryToolkit.Infra.Services
                     }
                 }
             }
+
+            // 3b. UNVERIFIED-LABEL FALLBACK
+            // Some receipts print "Nombre del beneficiario: Dato no verificado por esta institución"
+            // with no name after the label at all — the real payee name instead sits on its own line
+            // above the label's line (the label itself is often preceded on that line by other text,
+            // e.g. "Asunto beneficiario: 021180070037622911 Nombre del beneficiario: ..."). Only kicks
+            // in when nothing above found a name.
+            if (string.IsNullOrWhiteSpace(vendorName))
+            {
+                Match precedingLineMatch = Regex.Match(
+                    rawPdfText,
+                    @"([^\r\n]+)\r?\n[^\r\n]*(?:Titular\s+de\s+la\s+cuenta|Nombre\s+del\s+beneficiario):\s*Dato\s*no\s*verificado",
+                    RegexOptions.IgnoreCase);
+
+                if (precedingLineMatch.Success)
+                {
+                    vendorName = CleanseAndHealText(precedingLineMatch.Groups[1].Value);
+                }
+            }
             #endregion
 
             // --- 4. CURRENCY EXTRACTION (The Grand Finale) ---
@@ -228,6 +247,23 @@ namespace TreasuryToolkit.Infra.Services
                     }
                 }
             }
+
+            // 4b. SPID-SERVICE USD FALLBACK
+            // Some receipts carry no Divisa/Moneda field at all, but a "Descripción del servicio: SPID"
+            // tag marks the transfer as a USD-denominated SPID (US Dollar clearing) payment.
+            // Last-resort check — only runs when every strategy above found nothing.
+            if (string.IsNullOrWhiteSpace(currency))
+            {
+                Match spidServiceMatch = Regex.Match(
+                    rawPdfText,
+                    @"Descripci[oó]n\s+del\s+servicio:\s*SPID\b",
+                    RegexOptions.IgnoreCase);
+
+                if (spidServiceMatch.Success)
+                {
+                    currency = "USD";
+                }
+            }
             #endregion
 
             // --- 4. DATE EXTRACTION ---
@@ -243,7 +279,7 @@ namespace TreasuryToolkit.Infra.Services
             }
             else
             {
-                var datePattern = @"(?:Fecha\s+de\s+(?:aplicación|liquidación):?)\s*(?<date>\d{2}/\d{2}/\d{4})"
+                var datePattern = @"(?:Fecha\s+de\s+(?:aplicación|liquidación|operación):?)\s*(?<date>\d{2}/\d{2}/\d{4})"
                     + @"|(?:Fecha\s+de)\s+(?<date>\d{2}/\d{2}/\d{4})[^\r\n]*[\r\n]+\s*liquidación:";
 
                 Match dateMatch = Regex.Match(rawPdfText, datePattern, RegexOptions.IgnoreCase);
