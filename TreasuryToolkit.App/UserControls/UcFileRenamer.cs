@@ -73,7 +73,7 @@ namespace TreasuryToolkit.App
             if (e.Control is TextBox textBox)
             {
                 var column = DgvPayments.CurrentCell.OwningColumn;
-                bool forceUpper = column == Column1 || column == dgvPaymentsColVendor || column == dgvPaymentsColConcept;
+                bool forceUpper = column == dgvPaymentsColVendor || column == dgvPaymentsColConcept;
                 textBox.CharacterCasing = forceUpper ? CharacterCasing.Upper : CharacterCasing.Normal;
             }
         }
