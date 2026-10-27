@@ -149,7 +149,7 @@
             Controls.Add(PnlSideBar);
             ForeColor = Color.White;
             Icon = (Icon)resources.GetObject("$this.Icon");
-            MaximizeBox = false;
+            MinimumSize = new Size(1265, 642);
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Tesoreria";

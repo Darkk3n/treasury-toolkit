@@ -66,13 +66,13 @@
             DgvPayments.BorderStyle = BorderStyle.None;
             DgvPayments.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             DgvPayments.Columns.AddRange(new DataGridViewColumn[] { dgvPaymentsColDate, Column1, dgvPaymentsColVendor, dgvPaymentsColConcept, dgvPaymentsColAmount, Column2, Column3 });
-            DgvPayments.Dock = DockStyle.Bottom;
+            DgvPayments.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             DgvPayments.EnableHeadersVisualStyles = false;
-            DgvPayments.Location = new Point(0, 138);
+            DgvPayments.Location = new Point(0, 100);
             DgvPayments.Margin = new Padding(4);
             DgvPayments.Name = "DgvPayments";
             DgvPayments.ScrollBars = ScrollBars.Vertical;
-            DgvPayments.Size = new Size(1323, 505);
+            DgvPayments.Size = new Size(1323, 543);
             DgvPayments.TabIndex = 1;
             DgvPayments.CellValidated += DgvPayments_CellValidated;
             DgvPayments.CellValidating += DgvPayments_CellValidating;
