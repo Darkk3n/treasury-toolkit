@@ -7,5 +7,6 @@ namespace TreasuryToolkit.App
     public class LocalAppSettings
     {
         public bool IsDarkMode { get; set; } = false;
+        public bool IsSidebarCollapsed { get; set; } = false;
     }
 }
