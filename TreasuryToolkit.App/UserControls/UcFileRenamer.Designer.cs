@@ -77,6 +77,7 @@
             DgvPayments.CellValidated += DgvPayments_CellValidated;
             DgvPayments.CellValidating += DgvPayments_CellValidating;
             DgvPayments.DefaultValuesNeeded += DgvPayments_DefaultValuesNeeded;
+            DgvPayments.EditingControlShowing += DgvPayments_EditingControlShowing;
             // 
             // label1
             // 
