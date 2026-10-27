@@ -67,6 +67,17 @@ namespace TreasuryToolkit.App
 
         private void DgvPayments_DefaultValuesNeeded(object sender, DataGridViewRowEventArgs e) => e.Row.Cells[0].Value = formattedDate;
 
+        private void DgvPayments_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            // The editing TextBox is reused across columns, so casing must be reset for the others
+            if (e.Control is TextBox textBox)
+            {
+                var column = DgvPayments.CurrentCell.OwningColumn;
+                bool forceUpper = column == dgvPaymentsColVendor || column == dgvPaymentsColConcept;
+                textBox.CharacterCasing = forceUpper ? CharacterCasing.Upper : CharacterCasing.Normal;
+            }
+        }
+
         private void DgvPayments_CellValidated(object sender, DataGridViewCellEventArgs e)
         {
             if (DgvPayments.Columns[e.ColumnIndex].Name == "dgvPaymentsColAmount")
