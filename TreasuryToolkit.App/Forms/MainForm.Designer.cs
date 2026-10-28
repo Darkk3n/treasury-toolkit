@@ -28,13 +28,17 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             PnlSideBar = new Panel();
             ChkGlobalTheme = new CheckBox();
             BtnAbout = new Button();
             BtnExcelTool = new Button();
             BtnPdfTool = new Button();
+            BtnToggleSidebar = new Button();
             PnlMainContent = new Panel();
+            TipSidebar = new ToolTip(components);
+            TmrSidebarAnimation = new System.Windows.Forms.Timer(components);
             PnlSideBar.SuspendLayout();
             SuspendLayout();
             // 
@@ -45,6 +49,7 @@
             PnlSideBar.Controls.Add(BtnAbout);
             PnlSideBar.Controls.Add(BtnExcelTool);
             PnlSideBar.Controls.Add(BtnPdfTool);
+            PnlSideBar.Controls.Add(BtnToggleSidebar);
             PnlSideBar.Dock = DockStyle.Left;
             PnlSideBar.Location = new Point(0, 0);
             PnlSideBar.Name = "PnlSideBar";
@@ -106,7 +111,27 @@
             BtnPdfTool.Text = "Renombrador de PDFs";
             BtnPdfTool.UseVisualStyleBackColor = true;
             BtnPdfTool.Click += BtnPdfTool_Click;
-            // 
+            //
+            // BtnToggleSidebar
+            //
+            BtnToggleSidebar.Dock = DockStyle.Top;
+            BtnToggleSidebar.FlatAppearance.BorderSize = 0;
+            BtnToggleSidebar.FlatStyle = FlatStyle.Flat;
+            BtnToggleSidebar.Font = new Font("Segoe MDL2 Assets", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            BtnToggleSidebar.Name = "BtnToggleSidebar";
+            BtnToggleSidebar.Padding = new Padding(19, 0, 0, 0);
+            BtnToggleSidebar.Size = new Size(236, 40);
+            BtnToggleSidebar.TabIndex = 4;
+            BtnToggleSidebar.Text = "";
+            BtnToggleSidebar.TextAlign = ContentAlignment.MiddleLeft;
+            BtnToggleSidebar.UseVisualStyleBackColor = false;
+            BtnToggleSidebar.Click += BtnToggleSidebar_Click;
+            //
+            // TmrSidebarAnimation
+            //
+            TmrSidebarAnimation.Interval = 10;
+            TmrSidebarAnimation.Tick += TmrSidebarAnimation_Tick;
+            //
             // PnlMainContent
             // 
             PnlMainContent.Dock = DockStyle.Fill;
@@ -124,10 +149,11 @@
             Controls.Add(PnlSideBar);
             ForeColor = Color.White;
             Icon = (Icon)resources.GetObject("$this.Icon");
-            MaximizeBox = false;
+            MinimumSize = new Size(1265, 642);
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Tesoreria";
+            FormClosing += MainForm_FormClosing;
             PnlSideBar.ResumeLayout(false);
             PnlSideBar.PerformLayout();
             ResumeLayout(false);
@@ -141,5 +167,8 @@
         private Button BtnAbout;
         private Panel PnlMainContent;
         private CheckBox ChkGlobalTheme;
+        private Button BtnToggleSidebar;
+        private ToolTip TipSidebar;
+        private System.Windows.Forms.Timer TmrSidebarAnimation;
     }
 }

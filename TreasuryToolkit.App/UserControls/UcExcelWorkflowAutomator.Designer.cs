@@ -67,9 +67,9 @@
             dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
             dataGridViewCellStyle1.WrapMode = DataGridViewTriState.False;
             DgvResults.DefaultCellStyle = dataGridViewCellStyle1;
-            DgvResults.Dock = DockStyle.Bottom;
+            DgvResults.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             DgvResults.EnableHeadersVisualStyles = false;
-            DgvResults.Location = new Point(0, 139);
+            DgvResults.Location = new Point(0, 99);
             DgvResults.Margin = new Padding(4);
             DgvResults.Name = "DgvResults";
             dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
@@ -81,7 +81,7 @@
             dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
             DgvResults.RowHeadersDefaultCellStyle = dataGridViewCellStyle2;
             DgvResults.ScrollBars = ScrollBars.Vertical;
-            DgvResults.Size = new Size(1323, 504);
+            DgvResults.Size = new Size(1323, 544);
             DgvResults.TabIndex = 0;
             // 
             // Column1

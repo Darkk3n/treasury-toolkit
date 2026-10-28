@@ -18,6 +18,11 @@ namespace TreasuryToolkit.App
         private readonly ICompanyService companyService;
         private ImageList _lightThemeIcons;
         private ImageList _darkThemeIcons;
+        private bool _isSidebarCollapsed = false;
+        private Dictionary<Control, string> _sidebarLabels;
+        private const int SidebarExpandedWidth = 236;
+        private const int SidebarCollapsedWidth = 56;
+        private const int SidebarAnimationStep = 30;
         #endregion
 
         #region Constructor
@@ -28,10 +33,21 @@ namespace TreasuryToolkit.App
             this.fileScanner = fileScanner;
             this.companyService = companyService;
             InitializeComponent();
+            _sidebarLabels = new()
+            {
+                [BtnPdfTool] = BtnPdfTool.Text,
+                [BtnExcelTool] = BtnExcelTool.Text,
+                [BtnAbout] = BtnAbout.Text,
+                [ChkGlobalTheme] = ChkGlobalTheme.Text
+            };
             InitViews();
             LoadSettings();
             InitializeIconContainers();
             ConfigureSidebarButtonLayouts();
+
+            // Restore the saved sidebar state instantly, without animating
+            PnlSideBar.Width = _isSidebarCollapsed ? SidebarCollapsedWidth : SidebarExpandedWidth;
+            ApplySidebarLabels();
             ShowView(_fileRenamer);
         }
         #endregion
@@ -61,6 +77,42 @@ namespace TreasuryToolkit.App
             ShowView(_about);
             UpdateButtonHighlight(BtnAbout);
         }
+
+        private void BtnToggleSidebar_Click(object sender, EventArgs e)
+        {
+            _isSidebarCollapsed = !_isSidebarCollapsed;
+
+            // Hide labels before shrinking so they never show clipped; expanding restores them once at full width
+            if (_isSidebarCollapsed)
+            {
+                ApplySidebarLabels();
+            }
+
+            TmrSidebarAnimation.Start();
+            SaveSettings();
+        }
+
+        private void TmrSidebarAnimation_Tick(object sender, EventArgs e)
+        {
+            int target = _isSidebarCollapsed ? SidebarCollapsedWidth : SidebarExpandedWidth;
+            int step = _isSidebarCollapsed ? -SidebarAnimationStep : SidebarAnimationStep;
+            int nextWidth = PnlSideBar.Width + step;
+
+            if ((_isSidebarCollapsed && nextWidth <= target) || (!_isSidebarCollapsed && nextWidth >= target))
+            {
+                PnlSideBar.Width = target;
+                TmrSidebarAnimation.Stop();
+                if (!_isSidebarCollapsed)
+                {
+                    ApplySidebarLabels();
+                }
+                return;
+            }
+
+            PnlSideBar.Width = nextWidth;
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e) => SaveSettings();
         #endregion
 
         #region Helpers
@@ -75,6 +127,9 @@ namespace TreasuryToolkit.App
 
                     if (settings != null)
                     {
+                        // Must be set before Checked, whose CheckedChanged handler calls SaveSettings
+                        _isSidebarCollapsed = settings.IsSidebarCollapsed;
+                        RestoreWindowSize(settings);
                         ChkGlobalTheme.Checked = settings.IsDarkMode;
                         _isDarkMode = settings.IsDarkMode;
                     }
@@ -101,6 +156,8 @@ namespace TreasuryToolkit.App
                 BtnExcelTool.ImageList = _darkThemeIcons;
                 BtnAbout.ImageList = _darkThemeIcons;
                 ChkGlobalTheme.ForeColor = Color.White;
+                BtnToggleSidebar.ForeColor = Color.White;
+                BtnToggleSidebar.BackColor = PnlSideBar.BackColor;
             }
             else
             {
@@ -114,6 +171,8 @@ namespace TreasuryToolkit.App
                 BtnPdfTool.ImageList = _lightThemeIcons;
                 BtnExcelTool.ImageList = _lightThemeIcons;
                 BtnAbout.ImageList = _lightThemeIcons;
+                BtnToggleSidebar.ForeColor = Color.Black;
+                BtnToggleSidebar.BackColor = PnlSideBar.BackColor;
             }
 
             if (_currentView is UcFileRenamer pdfView)
@@ -160,9 +219,33 @@ namespace TreasuryToolkit.App
             };
         }
 
+        private void RestoreWindowSize(LocalAppSettings settings)
+        {
+            if (settings.WindowWidth > 0 && settings.WindowHeight > 0)
+            {
+                // Clamp in case the saved size came from a larger monitor; MinimumSize enforces the lower bound
+                var workingArea = Screen.PrimaryScreen.WorkingArea;
+                Size = new Size(Math.Min(settings.WindowWidth, workingArea.Width), Math.Min(settings.WindowHeight, workingArea.Height));
+            }
+
+            if (settings.IsWindowMaximized)
+            {
+                WindowState = FormWindowState.Maximized;
+            }
+        }
+
         private void SaveSettings()
         {
-            var settings = new LocalAppSettings { IsDarkMode = ChkGlobalTheme.Checked };
+            // While maximized (or minimized), Size is the screen size, so persist the restored size instead
+            var normalSize = WindowState == FormWindowState.Normal ? Size : RestoreBounds.Size;
+            var settings = new LocalAppSettings
+            {
+                IsDarkMode = ChkGlobalTheme.Checked,
+                IsSidebarCollapsed = _isSidebarCollapsed,
+                WindowWidth = normalSize.Width,
+                WindowHeight = normalSize.Height,
+                IsWindowMaximized = WindowState == FormWindowState.Maximized
+            };
             string json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(settingsFilePath, json);
         }
@@ -219,6 +302,23 @@ namespace TreasuryToolkit.App
             BtnAbout.TextAlign = ContentAlignment.MiddleLeft;
             BtnAbout.Padding = new Padding(15, 0, 0, 0);
             BtnAbout.ImageIndex = 2;
+        }
+
+        private void ApplySidebarLabels()
+        {
+            Button[] navButtons = [BtnPdfTool, BtnExcelTool, BtnAbout];
+            foreach (Button button in navButtons)
+            {
+                button.Text = _isSidebarCollapsed ? string.Empty : _sidebarLabels[button];
+                button.ImageAlign = _isSidebarCollapsed ? ContentAlignment.MiddleCenter : ContentAlignment.MiddleLeft;
+                button.Padding = _isSidebarCollapsed ? Padding.Empty : new Padding(15, 0, 0, 0);
+                TipSidebar.SetToolTip(button, _isSidebarCollapsed ? _sidebarLabels[button] : null);
+            }
+
+            // Reduced padding keeps the checkbox centered within the collapsed rail
+            ChkGlobalTheme.Text = _isSidebarCollapsed ? string.Empty : _sidebarLabels[ChkGlobalTheme];
+            ChkGlobalTheme.Padding = _isSidebarCollapsed ? new Padding(21, 0, 0, 0) : new Padding(40, 0, 0, 0);
+            TipSidebar.SetToolTip(ChkGlobalTheme, _isSidebarCollapsed ? _sidebarLabels[ChkGlobalTheme] : null);
         }
         #endregion
     }
