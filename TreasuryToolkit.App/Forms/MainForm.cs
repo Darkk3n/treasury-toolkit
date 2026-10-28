@@ -111,6 +111,8 @@ namespace TreasuryToolkit.App
 
             PnlSideBar.Width = nextWidth;
         }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e) => SaveSettings();
         #endregion
 
         #region Helpers
@@ -127,6 +129,7 @@ namespace TreasuryToolkit.App
                     {
                         // Must be set before Checked, whose CheckedChanged handler calls SaveSettings
                         _isSidebarCollapsed = settings.IsSidebarCollapsed;
+                        RestoreWindowSize(settings);
                         ChkGlobalTheme.Checked = settings.IsDarkMode;
                         _isDarkMode = settings.IsDarkMode;
                     }
@@ -216,9 +219,33 @@ namespace TreasuryToolkit.App
             };
         }
 
+        private void RestoreWindowSize(LocalAppSettings settings)
+        {
+            if (settings.WindowWidth > 0 && settings.WindowHeight > 0)
+            {
+                // Clamp in case the saved size came from a larger monitor; MinimumSize enforces the lower bound
+                var workingArea = Screen.PrimaryScreen.WorkingArea;
+                Size = new Size(Math.Min(settings.WindowWidth, workingArea.Width), Math.Min(settings.WindowHeight, workingArea.Height));
+            }
+
+            if (settings.IsWindowMaximized)
+            {
+                WindowState = FormWindowState.Maximized;
+            }
+        }
+
         private void SaveSettings()
         {
-            var settings = new LocalAppSettings { IsDarkMode = ChkGlobalTheme.Checked, IsSidebarCollapsed = _isSidebarCollapsed };
+            // While maximized (or minimized), Size is the screen size, so persist the restored size instead
+            var normalSize = WindowState == FormWindowState.Normal ? Size : RestoreBounds.Size;
+            var settings = new LocalAppSettings
+            {
+                IsDarkMode = ChkGlobalTheme.Checked,
+                IsSidebarCollapsed = _isSidebarCollapsed,
+                WindowWidth = normalSize.Width,
+                WindowHeight = normalSize.Height,
+                IsWindowMaximized = WindowState == FormWindowState.Maximized
+            };
             string json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(settingsFilePath, json);
         }

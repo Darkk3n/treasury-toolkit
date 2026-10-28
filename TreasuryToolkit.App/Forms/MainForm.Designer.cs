@@ -153,6 +153,7 @@
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Tesoreria";
+            FormClosing += MainForm_FormClosing;
             PnlSideBar.ResumeLayout(false);
             PnlSideBar.PerformLayout();
             ResumeLayout(false);
