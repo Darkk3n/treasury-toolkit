@@ -29,7 +29,7 @@
   },
   {
     "Id": "8",
-    "Name": "BUENA COPA"
+    "Name": "BUENACOPA"
   },
   {
     "Id": "9",
@@ -133,11 +133,11 @@
   },
   {
     "Id": "34",
-    "Name": "IMMOPREET QUERETARO"
+    "Name": "IMMOPREET QRO"
   },
   {
     "Id": "35",
-    "Name": "IMMOPRETT MEXICO"
+    "Name": "IMMOPRETT MX"
   },
   {
     "Id": "36",
@@ -181,11 +181,11 @@
   },
   {
     "Id": "46",
-    "Name": "ME PROCUREPRO"
+    "Name": "ME"
   },
   {
     "Id": "47",
-    "Name": "MER AL"
+    "Name": "MER-AL FILTER"
   },
   {
     "Id": "48",
@@ -229,7 +229,7 @@
   },
   {
     "Id": "58",
-    "Name": "PP TMK MEXICO"
+    "Name": "PP TMK"
   },
   {
     "Id": "59",
@@ -294,9 +294,5 @@
   {
     "Id": "74",
     "Name": "XENON"
-  },
-  {
-    "Id": "75",
-    "Name": "BECHEM"
   }
 ]
