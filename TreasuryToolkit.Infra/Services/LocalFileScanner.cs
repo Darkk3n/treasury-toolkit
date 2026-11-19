@@ -101,6 +101,7 @@ namespace TreasuryToolkit.Infra.Services
                 @"|\bMEXICOS\s*DERL\b" +                 // Explicitly targets a known problem string
                 @"|\bS\s*DE?\s*R?L?\s*DE?\s*C?V?\b" +    // Dynamic catcher for S DE RL DE CV fragments
                 @"|\bSA\s*DE\s*C?V?\b" +                 // Dynamic catcher for SA DE CV fragments
+                @"|\bS\s*A\b(?=\s*(?:DE\b|$))" +         // "SA"/"S A" cut off by a line wrap ("... SA", "... S A DE")
                 @"|\bSAPI\s*DE\s*C?V?\b" +               // Dynamic catcher for SAPI DE CV fragments
                 @"|\bS\s*DE?R?L?\b" +                    // Catches "S DERL" or "S DE RL"
                 @"|\bSC\b)",                             // Isolated SC boundary
