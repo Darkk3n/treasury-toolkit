@@ -147,7 +147,9 @@ namespace TreasuryToolkit.App
                     Concept = r.Cells[3].Value?.ToString(),
                     Amount = r.Cells[4].FormattedValue?.ToString(),
                     Currency = r.Cells[5].Value?.ToString(),
-                    Comment = $"{r.Cells[6].Value?.ToString()}"
+                    Comment = $"{r.Cells[6].Value?.ToString()}",
+                    // Scanned rows carry their page span in Tag; manually added rows default to 1 page.
+                    PageCount = r.Tag is int pageCount ? pageCount : 1
                 })
                 .ToList();
 
@@ -235,7 +237,8 @@ namespace TreasuryToolkit.App
                 },
                  onRowExtracted: (dataPayload) =>
                  {
-                     DgvPayments.Rows.Add(dataPayload.Date, dataPayload.FileName, dataPayload.Vendor, dataPayload.Concept, dataPayload.Amount, dataPayload.Currency);
+                     int rowIndex = DgvPayments.Rows.Add(dataPayload.Date, dataPayload.FileName, dataPayload.Vendor, dataPayload.Concept, dataPayload.Amount, dataPayload.Currency);
+                     DgvPayments.Rows[rowIndex].Tag = dataPayload.PageCount;
                      Application.DoEvents();
                  }
             );
