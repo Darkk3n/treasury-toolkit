@@ -24,6 +24,9 @@ namespace TreasuryToolkit.Infra.Services
                     using PdfDocument pdfDoc = new(pdfReader);
                     int totalPages = pdfDoc.GetNumberOfPages();
 
+                    // Rows are held back one page so a following continuation page can be folded into them.
+                    ScannedPaymentData pendingRow = null;
+
                     for (int pageNum = 1; pageNum <= totalPages; pageNum++)
                     {
                         if (totalPages > 1)
@@ -32,18 +35,34 @@ namespace TreasuryToolkit.Infra.Services
                         }
 
                         string pageText = PdfTextExtractor.GetTextFromPage(pdfDoc.GetPage(pageNum));
-                        if (string.IsNullOrWhiteSpace(pageText)) continue;
 
-                        ExtractPdfDataPoints(
-                            pageText,
-                            out string amount,
-                            out string vendor,
-                            out string concept,
-                            out string currency,
-                            out string date
-                        );
+                        string amount = string.Empty, vendor = string.Empty, concept = string.Empty, currency = string.Empty, date = string.Empty;
+                        if (!string.IsNullOrWhiteSpace(pageText))
+                        {
+                            ExtractPdfDataPoints(pageText, out amount, out vendor, out concept, out currency, out date);
+                        }
 
-                        onRowExtracted?.Invoke(new ScannedPaymentData
+                        bool pageHasNoData = string.IsNullOrWhiteSpace(amount)
+                            && string.IsNullOrWhiteSpace(vendor)
+                            && string.IsNullOrWhiteSpace(concept)
+                            && string.IsNullOrWhiteSpace(currency)
+                            && string.IsNullOrWhiteSpace(date);
+
+                        // CONTINUATION PAGE: nothing to extract, right after a page of the same file that
+                        // did yield data (e.g. an interbank transfer receipt whose "Detalle de firmas" table spills
+                        // onto page 2). It belongs to that receipt, so extend its row instead of creating a
+                        // new one — the processor then keeps both pages together in a single output PDF.
+                        // A page with no data that does NOT follow a recognized page (unknown layout) still
+                        // gets its own empty row so the user can fill it in manually.
+                        if (pageHasNoData && pendingRow != null && RowHasData(pendingRow))
+                        {
+                            pendingRow.PageCount++;
+                            continue;
+                        }
+
+                        if (pendingRow != null) onRowExtracted?.Invoke(pendingRow);
+
+                        pendingRow = new ScannedPaymentData
                         {
                             Date = date,
                             FileName = fileNameOnly,
@@ -51,8 +70,10 @@ namespace TreasuryToolkit.Infra.Services
                             Concept = concept,
                             Amount = amount,
                             Currency = currency
-                        });
+                        };
                     }
+
+                    if (pendingRow != null) onRowExtracted?.Invoke(pendingRow);
                 }
                 catch (Exception ex)
                 {
@@ -69,6 +90,28 @@ namespace TreasuryToolkit.Infra.Services
                 }
             }
         }
+
+        /// <summary>
+        /// Cuts a raw vendor string at the first adjacent field label or legal-entity suffix
+        /// (SA DE CV, S DE RL DE CV, SAPI DE CV, SC...), keeping only the company's core name.
+        /// </summary>
+        private static string StripCompanySuffix(string rawVendorName) =>
+            Regex.Split(rawVendorName,
+                @"(?:RFC|Banco|Monto|Importe|Motivo|Concepto|Dato\s*no\s*verificado" +
+                @"|\bMEXICOS\s*DERL\b" +                 // Explicitly targets a known problem string
+                @"|\bS\s*DE?\s*R?L?\s*DE?\s*C?V?\b" +    // Dynamic catcher for S DE RL DE CV fragments
+                @"|\bSA\s*DE\s*C?V?\b" +                 // Dynamic catcher for SA DE CV fragments
+                @"|\bSAPI\s*DE\s*C?V?\b" +               // Dynamic catcher for SAPI DE CV fragments
+                @"|\bS\s*DE?R?L?\b" +                    // Catches "S DERL" or "S DE RL"
+                @"|\bSC\b)",                             // Isolated SC boundary
+                RegexOptions.IgnoreCase)[0];
+
+        private static bool RowHasData(PaymentRowData row) =>
+            !string.IsNullOrWhiteSpace(row.Amount)
+            || !string.IsNullOrWhiteSpace(row.Vendor)
+            || !string.IsNullOrWhiteSpace(row.Concept)
+            || !string.IsNullOrWhiteSpace(row.Currency)
+            || !string.IsNullOrWhiteSpace(row.Date);
 
         private static string CleanseAndHealText(string rawText)
         {
@@ -138,25 +181,33 @@ namespace TreasuryToolkit.Infra.Services
             #region Vendor
             string structuralPattern = @"(?:Titular\s+de\s+la\s+cuenta|Nombre\s+del\s+beneficiario):.*?(?:Titular\s+de\s+la\s+cuenta|Nombre\s+del\s:beneficiario):\s*([^\r\n:]+)";
 
+            // TWO-COLUMN, VERTICALLY-CENTERED LAYOUT (interbank transfer receipts)
+            // Both "Titular de la cuenta:" labels share one line and each name wraps around it, so the
+            // text extractor interleaves the two columns line by line, e.g.:
+            //     CARL BECHEM MEXICO L                                            <- ordering, line 1
+            //     EUROPARTNERS MEXICO SA                                          <- beneficiary, line 1
+            //     Titular de la cuenta: UBRICATION TECHNOLOG Y S Titular de la cuenta:
+            //     DE CV                                                           <- beneficiary, line 2
+            //     DE RL DE CV                                                     <- ordering, line 3
+            // The 2nd label ends its line, so the generic pattern would grab "DE CV" from the next
+            // line. Here the beneficiary is the line right above the label line plus the line right below.
+            Match centeredColumnsMatch = Regex.Match(
+                rawPdfText,
+                @"([^\r\n]+)\r?\n[^\r\n]*(?:Titular\s+de\s+la\s+cuenta|Nombre\s+del\s+beneficiario):[^\r\n]*(?:Titular\s+de\s+la\s+cuenta|Nombre\s+del\s+beneficiario):[ \t]*\r?\n([^\r\n]+)",
+                RegexOptions.IgnoreCase);
+
             Match structuralMatch = Regex.Match(rawPdfText, structuralPattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
-            if (structuralMatch.Success)
+            if (centeredColumnsMatch.Success)
+            {
+                string rawVendorName = $"{centeredColumnsMatch.Groups[1].Value} {centeredColumnsMatch.Groups[2].Value}";
+                vendorName = CleanseAndHealText(StripCompanySuffix(rawVendorName));
+            }
+            else if (structuralMatch.Success)
             {
                 string rawVendorName = structuralMatch.Groups[1].Value;
 
-                // THE CLEANER: We use a generalized boundary pattern at the end.
-                // This catches variations of SA, CV, S, DE, RL, and SC dynamically.
-                string cleanVendorName = Regex.Split(rawVendorName,
-                    @"(?:RFC|Banco|Monto|Importe|Motivo|Concepto|Dato\s*no\s*verificado" +
-                    @"|\bMEXICOS\s*DERL\b" +                 // Explicitly targets your exact problem string
-                    @"|\bS\s*DE?\s*R?L?\s*DE?\s*C?V?\b" +    // Dynamic catcher for S DE RL DE CV fragments
-                    @"|\bSA\s*DE\s*C?V?\b" +                 // Dynamic catcher for SA DE CV fragments
-                    @"|\bSAPI\s*DE\s*C?V?\b" +               // Dynamic catcher for SAPI DE CV fragments
-                    @"|\bS\s*DE?R?L?\b" +                    // Catches "S DERL" or "S DE RL"
-                    @"|\bSC\b)",                             // Isolated SC boundary
-                    RegexOptions.IgnoreCase)[0];
-
-                vendorName = CleanseAndHealText(cleanVendorName);
+                vendorName = CleanseAndHealText(StripCompanySuffix(rawVendorName));
             }
             else
             {
@@ -175,18 +226,7 @@ namespace TreasuryToolkit.Infra.Services
 
                     if (fallbackMatch.Success)
                     {
-                        string singleMatch = fallbackMatch.Groups[1].Value;
-                        singleMatch = Regex.Split(singleMatch,
-                            @"(?:RFC|Banco|Monto|Importe|Motivo|Concepto|Dato\s*no\s*verificado" +
-                            @"|\bMEXICOS\s*DERL\b" +
-                            @"|\bS\s*DE?\s*R?L?\s*DE?\s*C?V?\b" +
-                            @"|\bSA\s*DE\s*C?V?\b" +
-                            @"|\bSAPI\s*DE\s*C?V?\b" +
-                            @"|\bS\s*DE?R?L?\b" +
-                            @"|\bSC\b)",
-                            RegexOptions.IgnoreCase)[0];
-
-                        vendorName = CleanseAndHealText(singleMatch);
+                        vendorName = CleanseAndHealText(StripCompanySuffix(fallbackMatch.Groups[1].Value));
                     }
                 }
             }
