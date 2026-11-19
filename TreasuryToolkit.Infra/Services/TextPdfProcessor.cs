@@ -51,6 +51,7 @@ namespace TreasuryToolkit.Infra.Services
                 string safeDestinationPath = GetUniqueFilePath(destinationPath);
 
                 int totalPagesInFile = 0;
+                int lastPageForRow = internalPageTracker;
 
                 ReaderProperties readerProperties = new();
                 readerProperties.SetPassword(Encoding.UTF8.GetBytes(""));
@@ -60,21 +61,31 @@ namespace TreasuryToolkit.Infra.Services
                 {
                     totalPagesInFile = sourcePdfDoc.GetNumberOfPages();
 
+                    // A row normally covers one page, but continuation pages detected by the scanner
+                    // (PageCount > 1) are copied into the same output file. Clamp to the file's end.
+                    lastPageForRow = Math.Min(internalPageTracker + Math.Max(row.PageCount, 1) - 1, totalPagesInFile);
+
                     using (PdfWriter writer = new(safeDestinationPath))
                     using (PdfDocument newSinglePagePdf = new(writer))
                     {
                         if (SpecialLogicCompanies.Contains(companyName))
                         {
-                            SliceSecuredPage(sourcePdfDoc, newSinglePagePdf, internalPageTracker);
+                            for (int pageNum = internalPageTracker; pageNum <= lastPageForRow; pageNum++)
+                            {
+                                SliceSecuredPage(sourcePdfDoc, newSinglePagePdf, pageNum);
+                            }
                         }
                         else
                         {
                             // Original high-performance path for standard files
-                            sourcePdfDoc.CopyPagesTo(internalPageTracker, internalPageTracker, newSinglePagePdf);
+                            sourcePdfDoc.CopyPagesTo(internalPageTracker, lastPageForRow, newSinglePagePdf);
                         }
                     }
 
-                    if (totalPagesInFile == 1)
+                    // Clean up the source when this single row consumed the whole file (a one-page file,
+                    // or a receipt whose extra pages were all continuation pages). Multi-page batch files
+                    // split across several rows are kept, as before.
+                    if (internalPageTracker == 1 && lastPageForRow == totalPagesInFile)
                     {
                         if (!filesToDelete.Contains(currentFilePath))
                         {
@@ -84,9 +95,9 @@ namespace TreasuryToolkit.Infra.Services
                 }
 
                 // Step tracking
-                if (internalPageTracker < totalPagesInFile)
+                if (lastPageForRow < totalPagesInFile)
                 {
-                    internalPageTracker++;
+                    internalPageTracker = lastPageForRow + 1;
                 }
                 else
                 {
