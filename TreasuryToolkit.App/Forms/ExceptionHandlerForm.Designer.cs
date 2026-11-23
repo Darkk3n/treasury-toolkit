@@ -62,11 +62,12 @@
             // 
             // TxtExceptionDetails
             // 
-            TxtExceptionDetails.Enabled = false;
             TxtExceptionDetails.Font = new Font("Segoe UI", 12F);
             TxtExceptionDetails.Location = new Point(12, 203);
             TxtExceptionDetails.Multiline = true;
             TxtExceptionDetails.Name = "TxtExceptionDetails";
+            TxtExceptionDetails.ReadOnly = true;
+            TxtExceptionDetails.ScrollBars = ScrollBars.Vertical;
             TxtExceptionDetails.Size = new Size(853, 194);
             TxtExceptionDetails.TabIndex = 2;
             // 
