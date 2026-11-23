@@ -289,10 +289,8 @@ namespace TreasuryToolkit.App
         {
             DgvPayments.Columns[0].FillWeight = 75;
             DgvPayments.Columns[1].FillWeight = 300;
-            DgvPayments.Columns[1].FillWeight = 300;
             DgvPayments.Rows.Clear();
             DgvPayments.Rows.Add(formattedDate);
-            DgvPayments.Columns[2].DefaultCellStyle.Format = "N2";
             foreach (DataGridViewColumn column in DgvPayments.Columns)
             {
                 column.SortMode = DataGridViewColumnSortMode.NotSortable;
