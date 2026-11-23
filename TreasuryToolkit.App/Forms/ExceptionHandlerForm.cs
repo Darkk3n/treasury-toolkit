@@ -21,7 +21,26 @@ namespace TreasuryToolkit.App
         {
             base.OnLoad(e);
             LoadAndApplySettings();
-            TxtExceptionDetails.Text = $"{exception.Message}\n\n\n{exception.InnerException}";
+            TxtExceptionDetails.Text = BuildExceptionDetails(exception);
+        }
+
+        private static string BuildExceptionDetails(Exception ex)
+        {
+            // A multiline TextBox only breaks lines on "\r\n", so build with Environment.NewLine.
+            string nl = Environment.NewLine;
+            var details = new System.Text.StringBuilder();
+
+            details.Append(ex.Message);
+            details.Append(nl).Append(nl).Append("Stack Trace:").Append(nl).Append(nl);
+            details.Append(string.IsNullOrWhiteSpace(ex.StackTrace) ? "(no disponible)" : ex.StackTrace);
+
+            if (ex.InnerException != null)
+            {
+                details.Append(nl).Append(nl).Append("Inner Exception:").Append(nl).Append(nl);
+                details.Append(ex.InnerException.ToString());
+            }
+
+            return details.ToString();
         }
 
         private void BtnClose_Click(object sender, EventArgs e) => Close();
