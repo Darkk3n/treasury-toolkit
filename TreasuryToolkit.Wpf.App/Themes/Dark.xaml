@@ -25,4 +25,7 @@
     <SolidColorBrush x:Key="GridLinesBrush" Color="#3F3F46" />
     <SolidColorBrush x:Key="LinkBrush" Color="#3FA9F5" />
     <SolidColorBrush x:Key="AccentBrush" Color="#007ACC" />
+    <SolidColorBrush x:Key="AccentForegroundBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="ItemHoverBackgroundBrush" Color="#3E3E42" />
+    <SolidColorBrush x:Key="WarningBrush" Color="#F2C94C" />
 </ResourceDictionary>

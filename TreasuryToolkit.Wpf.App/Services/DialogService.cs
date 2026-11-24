@@ -15,9 +15,19 @@ namespace TreasuryToolkit.Wpf.App.Services
         public bool Confirm(string message, string title) =>
             Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
 
-        // WPF's MessageBox has no Retry/Cancel buttons, so OK stands in for "Reintentar"
-        public bool AskRetry(string message, string title) =>
-            Show(message, title, MessageBoxButton.OKCancel, MessageBoxImage.Warning) == MessageBoxResult.OK;
+        // WPF's MessageBox has no Retry/Cancel buttons, so this uses the themed MessageWindow
+        public bool AskRetry(string message, string title)
+        {
+            var window = new MessageWindow(title, message, "Reintentar", "Cancelar");
+            var owner = GetOwner();
+            if (owner != null)
+            {
+                window.Owner = owner;
+                window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            }
+
+            return window.ShowDialog() == true;
+        }
 
         public string PickFolder(string title)
         {
