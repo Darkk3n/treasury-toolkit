@@ -61,3 +61,9 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+###############################################################################
+# Receipt-text test fixtures: keep the LF line endings iText produces, so the
+# tests see the same text the app does on every machine.
+###############################################################################
+TreasuryToolkit.Infra.Tests/Fixtures/** text eol=lf

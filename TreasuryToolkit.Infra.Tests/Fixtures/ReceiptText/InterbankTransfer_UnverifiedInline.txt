@@ -1,0 +1,30 @@
+Banca Electronica
+Fecha y hora de consulta:  15/01/2026 10:30:00  PM Contrato: 00000001
+Nombre del Cliente: EMPRESA DEMO MEXICO S DE RL DE CV
+  Banca Electronica - Pago Interbancario
+Operación autorizada
+ Transferencia en proceso de validación y aplicación
+Datos del firmante
+Usuario:  USR00001 Poder:  50%
+Datos de la operación
+Tipo de operación: Grupo Pago Interbancario
+  Descripción: PAGOS S12  Importe: 7,654.32
+  Cuenta de retiro: 000000000100000001  Cuenta de depósito: 000000000000000003
+  Divisa de la cuenta: MXP  Divisa de la cuenta: MXP
+  Titular de la cuenta: EMPRESA DEMO MEXICO S DE RL  Titular de la cuenta: REDESFICTICIAS
+DE CV Dato no verificado por esta institución
+  Banco beneficiario: BANCO DESTINO  Disponibilidad de pago: Mismo día
+  Fecha de creación: 14/01/2026  Fecha de aplicación: 15/01/2026
+  Concepto de pago: FACT00123  Referencia:
+  Hora de captura en el canal: 09:15:00
+Datos de confirmación de la transferencia
+  Folio interbancario: 0000000001  Clave de rastreo: 000000000000000000000001
+  Folio de firma: 1000000001  Folio único: X000000000000000000000000001
+Estado operación
+  Porcentaje firmado: 100%  Estado: Operado
+ PARA CONSULTAR EL ESTATUS DEL PAGO O TRANSFERENCIA; O SI DESEA OBTENER UN COMPROBANTE ELECTRÓNICO
+          DE PAGO CON VALIDEZ OFICIAL VISITE:	https://www.banxico.org.mx/cep/go
+Este vínculo se activará a más tardar dentro de los cinco minutos siguientes a la aceptación de la operación.
+  BANCO EJEMPLO, S.A., INSTITUCION DE BANCA MULTIPLE
+  Internet
+  www.banco-ejemplo.mx

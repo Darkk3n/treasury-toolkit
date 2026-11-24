@@ -1,0 +1,23 @@
+Banca Electronica
+Fecha y hora de consulta:  15/01/2026 10:30:00  PM Contrato: 00000001
+Nombre del Cliente: EMPRESA DEMO MEXICO S DE RL DE CV
+  Banca Electronica - Pago Mismo Banco
+Operación autorizada
+Datos del firmante
+Usuario:  USR00001 Poder:  50%
+Datos de la operación
+Tipo de operación: Grupo Pago Mismo Banco
+  Descripción: PAGOS S12  Importe: 12,345.67
+  Cuenta de retiro: 000000000100000001  Cuenta de depósito: 9000000001
+  Divisa de la cuenta: MXP  Divisa de la cuenta: MXP
+  Titular de la cuenta: EMPRESA DEMO MEXICO S DE RL  Titular de la cuenta: JUAN PEREZ LOPEZ
+DE CV
+  Fecha de creación: 14/01/2026  Fecha de aplicación: 15/01/2026
+  Hora de captura en el canal: 09:15:00  Motivo de pago: 8842
+Datos de confirmación de la transferencia
+  Folio de firma: 1000000001  Folio único: X000000000000000000000000001
+Estado operación
+  Porcentaje firmado: 100%  Estado: Operado
+  BANCO EJEMPLO, S.A., INSTITUCION DE BANCA MULTIPLE
+  Internet
+  www.banco-ejemplo.mx
