@@ -6,33 +6,47 @@ namespace TreasuryToolkit.Wpf.App.Services
 {
     public class DialogService(Func<ProgressWindow> progressWindowFactory, ErrorReportBuilder errorReportBuilder) : IDialogService
     {
-        public void ShowInfo(string message, string title) => Show(message, title, MessageBoxButton.OK, MessageBoxImage.Information);
+        // Every message uses the themed MessageWindow: the native MessageBox is drawn by Windows and can't follow
+        // the app's theme. Button texts are Spanish regardless of the Windows language.
+        public void ShowInfo(string message, string title) => ShowMessage(message, title, MessageKind.Information, "Aceptar");
 
-        public void ShowWarning(string message, string title) => Show(message, title, MessageBoxButton.OK, MessageBoxImage.Warning);
+        public void ShowWarning(string message, string title) => ShowMessage(message, title, MessageKind.Warning, "Aceptar");
 
-        public void ShowError(string message, string title) => Show(message, title, MessageBoxButton.OK, MessageBoxImage.Error);
+        public void ShowError(string message, string title) => ShowMessage(message, title, MessageKind.Error, "Aceptar");
 
-        public bool Confirm(string message, string title) =>
-            Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+        public bool Confirm(string message, string title) => ShowMessage(message, title, MessageKind.Question, "Sí", "No");
 
-        // WPF's MessageBox has no Retry/Cancel buttons, so this uses the themed MessageWindow
-        public bool AskRetry(string message, string title)
-        {
-            var window = new MessageWindow(title, message, "Reintentar", "Cancelar");
-            var owner = GetOwner();
-            if (owner != null)
-            {
-                window.Owner = owner;
-                window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            }
+        public bool AskRetry(string message, string title) => ShowMessage(message, title, MessageKind.Warning, "Reintentar", "Cancelar");
 
-            return window.ShowDialog() == true;
-        }
-
-        public string PickFolder(string title)
+        public string PickFolder(string title, string initialFolder = null)
         {
             var dialog = new OpenFolderDialog { Title = title, Multiselect = false };
+
+            string startFolder = NearestExistingFolder(initialFolder);
+            if (startFolder != null)
+            {
+                dialog.InitialDirectory = startFolder;
+            }
+
             return dialog.ShowDialog(GetOwner()) == true ? dialog.FolderName : null;
+        }
+
+        // A remembered folder may have been renamed or deleted since; walk up until something exists
+        private static string NearestExistingFolder(string folder)
+        {
+            try
+            {
+                while (!string.IsNullOrEmpty(folder) && !System.IO.Directory.Exists(folder))
+                {
+                    folder = System.IO.Path.GetDirectoryName(folder);
+                }
+
+                return string.IsNullOrEmpty(folder) ? null : folder;
+            }
+            catch (Exception)
+            {
+                return null; // A malformed path in the settings file shouldn't block the picker
+            }
         }
 
         public IProgressDialog ShowProgress(string initialStatus)
@@ -64,12 +78,18 @@ namespace TreasuryToolkit.Wpf.App.Services
             window.ShowDialog();
         }
 
-        private static MessageBoxResult Show(string message, string title, MessageBoxButton buttons, MessageBoxImage image)
+        // Returns true when the primary button was chosen
+        private static bool ShowMessage(string message, string title, MessageKind kind, string primaryButtonText, string secondaryButtonText = null)
         {
+            var window = new MessageWindow(title, message, kind, primaryButtonText, secondaryButtonText);
             var owner = GetOwner();
-            return owner != null
-                ? MessageBox.Show(owner, message, title, buttons, image)
-                : MessageBox.Show(message, title, buttons, image);
+            if (owner != null)
+            {
+                window.Owner = owner;
+                window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            }
+
+            return window.ShowDialog() == true;
         }
 
         // The active window if there is one (so a prompt over the progress window stays on top of it),

@@ -28,4 +28,5 @@
     <SolidColorBrush x:Key="AccentForegroundBrush" Color="#FFFFFF" />
     <SolidColorBrush x:Key="ItemHoverBackgroundBrush" Color="#3E3E42" />
     <SolidColorBrush x:Key="WarningBrush" Color="#F2C94C" />
+    <SolidColorBrush x:Key="ErrorBrush" Color="#FF6B6B" />
 </ResourceDictionary>

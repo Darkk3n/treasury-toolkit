@@ -22,6 +22,7 @@ namespace TreasuryToolkit.Wpf.App.ViewModels
         private readonly IDialogService dialogs;
         private readonly ISystemService system;
         private readonly SourceBackupService backupService;
+        private readonly SettingsService settings;
 
         [ObservableProperty]
         private CompanyModel selectedCompany;
@@ -36,13 +37,14 @@ namespace TreasuryToolkit.Wpf.App.ViewModels
         private bool isBusy;
 
         public FileRenamerViewModel(IFileScanner fileScanner, IPdfProcessor pdfProcessor, ICompanyService companyService,
-            IDialogService dialogs, ISystemService system, SourceBackupService backupService)
+            IDialogService dialogs, ISystemService system, SourceBackupService backupService, SettingsService settings)
         {
             this.fileScanner = fileScanner;
             this.pdfProcessor = pdfProcessor;
             this.dialogs = dialogs;
             this.system = system;
             this.backupService = backupService;
+            this.settings = settings;
 
             Companies = [PlaceholderCompany, .. companyService.GetCompanyNames()];
             Clean();
@@ -75,11 +77,15 @@ namespace TreasuryToolkit.Wpf.App.ViewModels
         [RelayCommand(CanExecute = nameof(IsIdle))]
         private async Task ScanFolderAsync()
         {
-            string folder = dialogs.PickFolder("Seleccione una carpeta");
+            string folder = dialogs.PickFolder("Seleccione una carpeta", settings.Current.LastFolder);
             if (folder == null)
             {
                 return;
             }
+
+            // Remembered even if the folder turns out to have no PDFs: it's where the user navigated to
+            settings.Current.LastFolder = folder;
+            settings.Save();
 
             IsBusy = true;
             try

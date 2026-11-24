@@ -16,8 +16,11 @@ namespace TreasuryToolkit.Wpf.App.Services
         /// <summary>Retry/Cancel prompt (e.g. a file in use). Returns true for Retry.</summary>
         bool AskRetry(string message, string title);
 
-        /// <summary>Returns the chosen folder, or null if the user cancelled.</summary>
-        string PickFolder(string title);
+        /// <summary>
+        /// Returns the chosen folder, or null if the user cancelled. Opens at <paramref name="initialFolder"/>, or
+        /// its nearest existing parent, when given.
+        /// </summary>
+        string PickFolder(string title, string initialFolder = null);
 
         /// <summary>Shows the progress window until the returned handle is disposed.</summary>
         IProgressDialog ShowProgress(string initialStatus);
