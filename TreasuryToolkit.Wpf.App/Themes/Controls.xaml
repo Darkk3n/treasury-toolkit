@@ -66,6 +66,59 @@
         <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
     </Style>
 
+    <!-- Grids (PDF tool, and the Excel tool later). Selected cells keep the system highlight, which reads well on both themes. -->
+    <Style TargetType="DataGrid">
+        <Setter Property="Background" Value="{DynamicResource SurfaceBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="RowBackground" Value="{DynamicResource SurfaceBackgroundBrush}" />
+        <Setter Property="AlternatingRowBackground" Value="{DynamicResource SurfaceBackgroundBrush}" />
+        <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource GridLinesBrush}" />
+        <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource GridLinesBrush}" />
+        <Setter Property="RowHeaderWidth" Value="24" />
+        <Setter Property="MinRowHeight" Value="26" />
+    </Style>
+
+    <Style TargetType="DataGridColumnHeader">
+        <Setter Property="Background" Value="{DynamicResource SidebarBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource GridLinesBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,1,1" />
+        <Setter Property="Padding" Value="6,4" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style TargetType="DataGridRowHeader">
+        <Setter Property="Background" Value="{DynamicResource SidebarBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource GridLinesBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,1,1" />
+    </Style>
+
+    <!-- Replaces the "select all" button in the grid's top-left corner with a plain, non-clickable header-colored
+         corner. The DataGrid template looks this style up by key, so nothing else of the template is overridden.
+         Ctrl+A still selects everything. -->
+    <Style x:Key="{ComponentResourceKey ResourceId=DataGridSelectAllButtonStyle, TypeInTargetAssembly={x:Type DataGrid}}"
+           TargetType="Button">
+        <Setter Property="IsHitTestVisible" Value="False" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{DynamicResource SidebarBackgroundBrush}"
+                            BorderBrush="{DynamicResource GridLinesBrush}"
+                            BorderThickness="0,0,1,1" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="DataGridCell">
+        <Setter Property="Padding" Value="4,0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
     <Style x:Key="LinkStyle" TargetType="Hyperlink">
         <Setter Property="Foreground" Value="{DynamicResource LinkBrush}" />
         <Setter Property="Cursor" Value="Hand" />

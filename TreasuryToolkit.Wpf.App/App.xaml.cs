@@ -58,6 +58,7 @@ namespace TreasuryToolkit.Wpf.App
             services.AddSingleton<ErrorReportBuilder>();
             services.AddSingleton<IDialogService, DialogService>();
             services.AddSingleton<ISystemService, SystemService>();
+            services.AddSingleton<SourceBackupService>();
 
             // Core contracts, same registrations as v1 (TreasuryToolkit.App/Program.cs)
             services.AddTransient<IPdfProcessor, TextPdfProcessor>();
