@@ -90,6 +90,7 @@ namespace TreasuryToolkit.App
 
             return
             [
+                ("App version", Application.ProductVersion.Split('+')[0]),
                 ("OS", Environment.OSVersion.VersionString),
                 (".NET", Environment.Version),
                 ("Culture", System.Globalization.CultureInfo.CurrentUICulture.Name),
