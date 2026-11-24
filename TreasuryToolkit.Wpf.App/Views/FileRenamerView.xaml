@@ -98,8 +98,10 @@
                 <DataGridTextColumn Header="Fecha" Width="Auto" MinWidth="90"
                                     Binding="{Binding Date}"
                                     EditingElementStyle="{StaticResource CellEditor}" />
-                <!-- Read-only: the file name is informative only; processing never used it -->
-                <DataGridTextColumn Header="Archivo" Width="2*" IsReadOnly="True"
+                <!-- Read-only: the file name is informative only; processing never used it. Sized to its header, as
+                     in v1 (DataGridViewAutoSizeColumnMode.ColumnHeader), so long names don't take space from the
+                     editable columns -->
+                <DataGridTextColumn Header="Archivo" Width="SizeToHeader" IsReadOnly="True"
                                     Binding="{Binding FileName}" />
                 <DataGridTextColumn Header="Proveedor" Width="2*"
                                     Binding="{Binding Vendor}"
