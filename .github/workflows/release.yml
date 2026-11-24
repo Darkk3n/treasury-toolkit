@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    # We use a standard Windows runner because we are compiling a WinForms application
+    # We use a standard Windows runner because we are compiling a WPF application
     runs-on: windows-latest
 
     steps:
@@ -55,9 +55,8 @@ jobs:
     - name: Run Tests
       run: dotnet test --project TreasuryToolkit.Infra.Tests/TreasuryToolkit.Infra.Tests.csproj -c Release --no-restore
 
-    # Step 5: Build + stage raw assemblies of the v2 WPF app (TreasuryToolkit.Wpf.App). Unlike the v1
-    # project, it has no Obfuscar target (bindings resolve ViewModel property names at runtime, so
-    # obfuscation would break them).
+    # Step 5: Build + stage raw assemblies of the WPF app (TreasuryToolkit.Wpf.App). It is deliberately
+    # not obfuscated: bindings resolve ViewModel property names at runtime, so obfuscation would break them.
     # PublishReadyToRun=true must be passed here too (not just on the --no-build publish below)
     # so this step's restore resolves the win-x64 crossgen2 package; --no-build implies
     # --no-restore, so the later step can't fetch it on its own (NETSDK1094 otherwise).
@@ -110,7 +109,7 @@ jobs:
         path: ./publish/TreasuryToolkit.zip
 
     # Step 9: Automatically create a GitHub Release and upload the zipped .exe file. Tags with a suffix
-    # (v2.0.0-beta.1) become prereleases, so they never show up as the latest release for v1 users.
+    # (v2.0.0-beta.1) become prereleases, so they never show up as the latest release.
     - name: Create GitHub Release
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v2

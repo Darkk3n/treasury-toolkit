@@ -60,7 +60,7 @@ namespace TreasuryToolkit.Wpf.App
             services.AddSingleton<ISystemService, SystemService>();
             services.AddSingleton<SourceBackupService>();
 
-            // Core contracts, same registrations as v1 (TreasuryToolkit.App/Program.cs)
+            // Core contracts, same registrations as v1
             services.AddTransient<IPdfProcessor, TextPdfProcessor>();
             services.AddTransient<IFileScanner, LocalFileScanner>();
             services.AddSingleton<ICompanyService, JsonCompanyService>();

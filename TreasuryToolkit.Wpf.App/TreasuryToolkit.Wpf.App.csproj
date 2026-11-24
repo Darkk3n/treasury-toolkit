@@ -20,9 +20,9 @@
 
 	<ItemGroup>
 		<!-- JsonCompanyService finds this through Assembly.GetEntryAssembly(), so it must be an EmbeddedResource
-		     (not a WPF Resource). Linked from the v1 project so company list changes on main keep flowing into v2;
-		     move the file here when TreasuryToolkit.App is removed at cutover. -->
-		<EmbeddedResource Include="..\TreasuryToolkit.App\Data\companies.json" Link="Data\companies.json" />
+		     (not a WPF Resource) -->
+		<None Remove="Data\companies.json" />
+		<EmbeddedResource Include="Data\companies.json" />
 		<Resource Include="Assets\Icon3.ico" />
 		<Resource Include="Assets\Error.png" />
 	</ItemGroup>
