@@ -12,6 +12,11 @@
 		<ApplicationIcon>Icon3.ico</ApplicationIcon>
 		<AssemblyName>TreasuryToolkit</AssemblyName>
 		<AssemblyTitle>TreasuryToolkit</AssemblyTitle>
+		<!-- Local builds are marked as dev builds; the release workflow overrides these from the git tag -->
+		<VersionPrefix>0.0.0</VersionPrefix>
+		<VersionSuffix>dev</VersionSuffix>
+		<!-- Keep Product Version as "1.2.3" instead of the SDK default "1.2.3+<commit sha>" -->
+		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

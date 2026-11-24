@@ -8,6 +8,11 @@ namespace TreasuryToolkit.App
         public UcAbout()
         {
             InitializeComponent();
+
+            // Stamped from the release tag by the CI workflow; local builds report the csproj's 0.0.0-dev.
+            // Split off any "+<build metadata>" in case a build still appends the commit sha.
+            string version = Application.ProductVersion.Split('+')[0];
+            label2.Text = $"Version {version} - Desarrollada y mantenida por Gerardo Aguilar";
         }
         #endregion
 
