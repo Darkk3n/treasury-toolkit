@@ -1,0 +1,13 @@
+<!-- Temporary view for sections not ported yet (PDF tool: phase 3, Excel: phase 4) -->
+<UserControl x:Class="TreasuryToolkit.Wpf.App.Views.PlaceholderView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+        <TextBlock Text="{Binding Title}" FontSize="24" HorizontalAlignment="Center" />
+        <TextBlock Margin="0,8,0,0"
+                   Text="Esta sección se migrará en una próxima fase de v2."
+                   Foreground="{DynamicResource SecondaryTextBrush}"
+                   FontSize="14"
+                   HorizontalAlignment="Center" />
+    </StackPanel>
+</UserControl>

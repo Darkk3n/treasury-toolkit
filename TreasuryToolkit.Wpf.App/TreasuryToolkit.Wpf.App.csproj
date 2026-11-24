@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net10.0-windows</TargetFramework>
+		<UseWPF>true</UseWPF>
+		<Nullable>disable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<RootNamespace>TreasuryToolkit.Wpf.App</RootNamespace>
+		<ApplicationIcon>Assets\Icon3.ico</ApplicationIcon>
+		<!-- Same exe name as v1 so the release zip, shortcuts and settings file location stay the same -->
+		<AssemblyName>TreasuryToolkit</AssemblyName>
+		<AssemblyTitle>TreasuryToolkit</AssemblyTitle>
+		<!-- Local builds are marked as dev builds; the release workflow overrides these from the git tag -->
+		<VersionPrefix>0.0.0</VersionPrefix>
+		<VersionSuffix>dev</VersionSuffix>
+		<!-- Keep Product Version as "1.2.3" instead of the SDK default "1.2.3+<commit sha>" -->
+		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- JsonCompanyService finds this through Assembly.GetEntryAssembly(), so it must be an EmbeddedResource
+		     (not a WPF Resource). Linked from the v1 project so company list changes on main keep flowing into v2;
+		     move the file here when TreasuryToolkit.App is removed at cutover. -->
+		<EmbeddedResource Include="..\TreasuryToolkit.App\Data\companies.json" Link="Data\companies.json" />
+		<Resource Include="Assets\Icon3.ico" />
+		<Resource Include="Assets\Error.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\TreasuryToolkit.Core\TreasuryToolkit.Core.csproj" />
+		<ProjectReference Include="..\TreasuryToolkit.Infra\TreasuryToolkit.Infra.csproj" />
+	</ItemGroup>
+
+</Project>

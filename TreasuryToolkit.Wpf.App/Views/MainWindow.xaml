@@ -1,0 +1,89 @@
+<Window x:Class="TreasuryToolkit.Wpf.App.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:TreasuryToolkit.Wpf.App.ViewModels"
+        xmlns:views="clr-namespace:TreasuryToolkit.Wpf.App.Views"
+        xmlns:conv="clr-namespace:TreasuryToolkit.Wpf.App.Converters"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
+        Title="Tesoreria"
+        Icon="/Assets/Icon3.ico"
+        Width="1265" Height="642"
+        MinWidth="1265" MinHeight="642"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource TextBrush}"
+        FontFamily="Segoe UI">
+
+    <Window.Resources>
+        <conv:EnumToBooleanConverter x:Key="EnumToBoolean" />
+
+        <!-- Each section's ViewModel is rendered by its view; the PDF and Excel tools are placeholders until phases 3-4 -->
+        <DataTemplate DataType="{x:Type vm:FileRenamerViewModel}">
+            <views:PlaceholderView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ExcelWorkflowViewModel}">
+            <views:PlaceholderView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:AboutViewModel}">
+            <views:AboutView />
+        </DataTemplate>
+    </Window.Resources>
+
+    <DockPanel>
+        <!-- Sidebar. Its width is animated from code-behind (236 expanded, 56 collapsed); ClipToBounds hides the
+             labels as it narrows, so the icons stay visible in the collapsed rail. -->
+        <Border x:Name="Sidebar"
+                DockPanel.Dock="Left"
+                Width="236"
+                ClipToBounds="True"
+                Background="{DynamicResource SidebarBackgroundBrush}">
+            <DockPanel>
+                <Button DockPanel.Dock="Top"
+                        Style="{StaticResource SidebarToggleButtonStyle}"
+                        Content="&#xE700;"
+                        Command="{Binding ToggleSidebarCommand}"
+                        AutomationProperties.Name="Mostrar u ocultar menú" />
+
+                <ToggleButton DockPanel.Dock="Bottom"
+                              Margin="0,0,0,8"
+                              Style="{StaticResource SidebarItemStyle}"
+                              Tag="&#xE708;"
+                              Content="Modo Oscuro"
+                              IsChecked="{Binding IsDarkMode}"
+                              ToolTip="Modo Oscuro"
+                              ToolTipService.IsEnabled="{Binding IsSidebarCollapsed}" />
+
+                <StackPanel>
+                    <RadioButton Style="{StaticResource NavItemStyle}"
+                                 GroupName="Navigation"
+                                 Tag="&#xE8A5;"
+                                 Content="Renombrador de PDFs"
+                                 IsChecked="{Binding SelectedSection, Converter={StaticResource EnumToBoolean}, ConverterParameter={x:Static vm:AppSection.PdfTool}}"
+                                 ToolTip="Renombrador de PDFs"
+                                 ToolTipService.IsEnabled="{Binding IsSidebarCollapsed}" />
+                    <RadioButton Style="{StaticResource NavItemStyle}"
+                                 GroupName="Navigation"
+                                 Tag="&#xF0E2;"
+                                 Content="Excel"
+                                 IsChecked="{Binding SelectedSection, Converter={StaticResource EnumToBoolean}, ConverterParameter={x:Static vm:AppSection.ExcelTool}}"
+                                 ToolTip="Excel"
+                                 ToolTipService.IsEnabled="{Binding IsSidebarCollapsed}" />
+                    <RadioButton Style="{StaticResource NavItemStyle}"
+                                 GroupName="Navigation"
+                                 Tag="&#xE946;"
+                                 Content="Acerca De"
+                                 IsChecked="{Binding SelectedSection, Converter={StaticResource EnumToBoolean}, ConverterParameter={x:Static vm:AppSection.About}}"
+                                 ToolTip="Acerca De"
+                                 ToolTipService.IsEnabled="{Binding IsSidebarCollapsed}" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <Border Background="{DynamicResource ContentBackgroundBrush}">
+            <ContentControl Content="{Binding CurrentViewModel}" Focusable="False" />
+        </Border>
+    </DockPanel>
+</Window>
