@@ -23,28 +23,52 @@ jobs:
       with:
         dotnet-version: '10.0.x' # Updates automatically to the latest patch release
 
-    # Step 3: Clean up and restore NuGet packages
+    # Step 3: Derive the version from the tag (v1.2.3 or v1.2.3-beta.1). VersionPrefix (numbers only)
+    # feeds AssemblyVersion and the exe's File Version; Version (prefix + optional suffix) becomes
+    # the Product Version. Manual runs have no tag, so they get an obvious 0.0.0-dev.<run> version.
+    - name: Determine Version
+      shell: pwsh
+      run: |
+        if ($env:GITHUB_REF_TYPE -eq 'tag') {
+          if ($env:GITHUB_REF_NAME -notmatch '^v(\d+\.\d+\.\d+)(?:-([0-9A-Za-z.-]+))?$') {
+            Write-Error "Tag '$env:GITHUB_REF_NAME' is not in the form v1.2.3 or v1.2.3-suffix"
+            exit 1
+          }
+          $prefix = $Matches[1]
+          $suffix = $Matches[2]
+        } else {
+          $prefix = '0.0.0'
+          $suffix = "dev.$env:GITHUB_RUN_NUMBER"
+        }
+        $version = if ($suffix) { "$prefix-$suffix" } else { $prefix }
+        Write-Host "Building version $version (file version $prefix.0)"
+        "VERSION_PREFIX=$prefix" >> $env:GITHUB_ENV
+        "VERSION=$version" >> $env:GITHUB_ENV
+
+    # Step 4: Clean up and restore NuGet packages
     - name: Restore Dependencies
       run: dotnet restore
 
-    # Step 4: Build + stage raw assemblies. Obfuscation runs automatically here via the
+    # Step 5: Build + stage raw assemblies. Obfuscation runs automatically here via the
     # ObfuscateAssemblies MSBuild target (TreasuryToolkit.App.csproj, AfterTargets="Build",
     # Configuration=Release) which invokes Obfuscar against $(TargetDir) using
     # TreasuryToolkit.App/obfuscar.xml before these files get copied to ./staging.
     # PublishReadyToRun=true must be passed here too (not just on the --no-build publish below)
     # so this step's restore resolves the win-x64 crossgen2 package; --no-build implies
     # --no-restore, so the later step can't fetch it on its own (NETSDK1094 otherwise).
+    # The version properties are passed to both publish steps so the assemblies and the bundled
+    # exe agree. (The csproj keeps the commit sha out of the Product Version.)
     - name: Stage Unbundled Binaries
       run: |
-        dotnet publish TreasuryToolkit.App/TreasuryToolkit.App.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=false /p:PublishReadyToRun=true -o ./staging
+        dotnet publish TreasuryToolkit.App/TreasuryToolkit.App.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=false /p:PublishReadyToRun=true /p:Version=$env:VERSION /p:AssemblyVersion="$env:VERSION_PREFIX.0" /p:FileVersion="$env:VERSION_PREFIX.0" -o ./staging
 
-    # Step 5: Bundle the already-obfuscated build output into a single .exe (--no-build reuses
+    # Step 6: Bundle the already-obfuscated build output into a single .exe (--no-build reuses
     # the output from the step above, so it does not re-run Compile/obfuscation).
     - name: Compile Single Executable Suite
       run: |
-        dotnet publish TreasuryToolkit.App/TreasuryToolkit.App.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true --no-build -o ./publish
+        dotnet publish TreasuryToolkit.App/TreasuryToolkit.App.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true /p:Version=$env:VERSION /p:AssemblyVersion="$env:VERSION_PREFIX.0" /p:FileVersion="$env:VERSION_PREFIX.0" --no-build -o ./publish
 
-    # Step 6: 🔏 CODE SIGN THE PUBLISHED EXECUTABLE 🔏
+    # Step 7: 🔏 CODE SIGN THE PUBLISHED EXECUTABLE 🔏
     - name: Code Sign Executable
       uses: dlemstra/code-sign-action@v1
       with:
@@ -53,14 +77,22 @@ jobs:
         folder: './publish'
         files: 'TreasuryToolkit.exe'
 
-    # Step 7: Zip the signed exe. Edge's SmartScreen download-reputation check ("isn't commonly
+    # Step 8: Zip the signed exe. Edge's SmartScreen download-reputation check ("isn't commonly
     # downloaded") targets directly-executable extensions like .exe; shipping a .zip avoids that
     # in-browser warning. (The OS-level SmartScreen prompt on first run is separate and untouched
     # by this - it still checks the exe's own cert/file reputation when the user runs it.)
     - name: Zip Release Asset
       run: Compress-Archive -Path ./publish/TreasuryToolkit.exe -DestinationPath ./publish/TreasuryToolkit.zip
 
-    # Step 8: Automatically create a GitHub Release and upload the zipped .exe file
+    # Manual runs don't create a release, so keep the build downloadable from the run page instead
+    - name: Upload Build Artifact
+      if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: TreasuryToolkit-${{ env.VERSION }}
+        path: ./publish/TreasuryToolkit.zip
+
+    # Step 9: Automatically create a GitHub Release and upload the zipped .exe file
     - name: Create GitHub Release
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v2
