@@ -1,7 +1,7 @@
 # TreasuryToolkit
 
 ## Overview
-TreasuryToolkit is a high-performance Windows desktop utility suite built with **.NET 10** and **WinForms**. Originally designed to tackle high-speed batch file renaming with strict preview guardrails, it is engineered to serve as a centralized hub for automating tedious administrative workflows, file parsing, and data manipulation.
+TreasuryToolkit is a high-performance Windows desktop utility suite built with **.NET 10** and **WPF**. Originally designed to tackle high-speed batch file renaming with strict preview guardrails, it is engineered to serve as a centralized hub for automating tedious administrative workflows, file parsing, and data manipulation.
 
 ## Key Features
 * **Batch File Renaming:** Rename hundreds of files or entire directories instantly.

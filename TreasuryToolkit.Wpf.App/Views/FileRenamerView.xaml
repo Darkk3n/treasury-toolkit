@@ -1,0 +1,130 @@
+<!-- Port of v1's UcFileRenamer. Layout follows v1: company + actions on top, source folder below, grid filling the rest. -->
+<UserControl x:Class="TreasuryToolkit.Wpf.App.Views.FileRenamerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:TreasuryToolkit.Wpf.App.ViewModels"
+             xmlns:validation="clr-namespace:TreasuryToolkit.Wpf.App.Validation"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:FileRenamerViewModel}"
+             FontSize="15">
+
+    <UserControl.Resources>
+        <!-- Editor shown while a cell is being edited; follows the theme instead of the system's white box -->
+        <Style x:Key="CellEditor" TargetType="TextBox">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="{DynamicResource SurfaceBackgroundBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            <Setter Property="CaretBrush" Value="{DynamicResource TextBrush}" />
+        </Style>
+
+        <!-- Vendor and concept are always upper case (v1's EditingControlShowing handler) -->
+        <Style x:Key="UpperCaseCellEditor" TargetType="TextBox" BasedOn="{StaticResource CellEditor}">
+            <Setter Property="CharacterCasing" Value="Upper" />
+        </Style>
+
+        <!-- Shows the validation message as a tooltip while the amount is invalid -->
+        <Style x:Key="AmountCellEditor" TargetType="TextBox" BasedOn="{StaticResource CellEditor}">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="RightAlignedCell" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="Margin" Value="4,0" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Empresa:" VerticalAlignment="Center" />
+            <!-- Editable with prefix auto-complete, like v1's SuggestAppend; typing a name that isn't in the list
+                 leaves no company selected, which "Renombrar" reports -->
+            <ComboBox Margin="8,0,0,0"
+                      Width="260"
+                      VerticalContentAlignment="Center"
+                      IsEditable="True"
+                      IsTextSearchEnabled="True"
+                      TextSearch.TextPath="Name"
+                      DisplayMemberPath="Name"
+                      ItemsSource="{Binding Companies}"
+                      SelectedItem="{Binding SelectedCompany}"
+                      IsEnabled="{Binding IsIdle}" />
+            <Button Margin="16,0,0,0" Content="Limpiar" Command="{Binding CleanCommand}" Click="FinishGridEdit_Click" />
+            <!-- No Command binding: the click handler first commits the grid edit, then runs StartCommand -->
+            <Button Margin="8,0,0,0" Content="Renombrar" IsEnabled="{Binding IsIdle}" Click="Start_Click" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Margin="0,12,0,12" Orientation="Horizontal">
+            <TextBlock Text="Ubicacion de Archivos:" VerticalAlignment="Center" />
+            <Button Margin="8,0,0,0" Padding="10,2" Content="..." Command="{Binding ScanFolderCommand}" Click="FinishGridEdit_Click"
+                    ToolTip="Seleccionar carpeta y escanear" />
+            <TextBlock Margin="8,0,0,0"
+                       VerticalAlignment="Center"
+                       TextTrimming="CharacterEllipsis"
+                       Text="{Binding FolderDisplay}"
+                       ToolTip="{Binding FolderDisplay}" />
+        </StackPanel>
+
+        <!-- Star widths share the remaining space, so there's no auto-fill resizing to crash like v1's grid -->
+        <DataGrid x:Name="PaymentsGrid"
+                  Grid.Row="2"
+                  ItemsSource="{Binding Rows}"
+                  IsEnabled="{Binding IsIdle}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="True"
+                  CanUserDeleteRows="False"
+                  CanUserSortColumns="False"
+                  CanUserReorderColumns="False"
+                  CanUserResizeRows="False"
+                  SelectionUnit="CellOrRowHeader">
+            <!-- Rows can't be deleted and Ctrl+A doesn't select the whole grid, to prevent accidents.
+                 Ctrl+A still selects the text inside a cell being edited, because the editor handles it first. -->
+            <DataGrid.CommandBindings>
+                <CommandBinding Command="ApplicationCommands.SelectAll" CanExecute="BlockSelectAll_CanExecute" />
+            </DataGrid.CommandBindings>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Fecha" Width="Auto" MinWidth="90"
+                                    Binding="{Binding Date}"
+                                    EditingElementStyle="{StaticResource CellEditor}" />
+                <!-- Read-only: the file name is informative only; processing never used it -->
+                <DataGridTextColumn Header="Archivo" Width="2*" IsReadOnly="True"
+                                    Binding="{Binding FileName}" />
+                <DataGridTextColumn Header="Proveedor" Width="2*"
+                                    Binding="{Binding Vendor}"
+                                    EditingElementStyle="{StaticResource UpperCaseCellEditor}" />
+                <DataGridTextColumn Header="Concepto" Width="2*"
+                                    Binding="{Binding Concept}"
+                                    EditingElementStyle="{StaticResource UpperCaseCellEditor}" />
+                <DataGridTextColumn Header="Monto" Width="Auto" MinWidth="110"
+                                    ElementStyle="{StaticResource RightAlignedCell}"
+                                    EditingElementStyle="{StaticResource AmountCellEditor}">
+                    <DataGridTextColumn.Binding>
+                        <Binding Path="Amount">
+                            <Binding.ValidationRules>
+                                <validation:AmountValidationRule />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </DataGridTextColumn.Binding>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Divisa" Width="Auto" MinWidth="70"
+                                    Binding="{Binding Currency}"
+                                    EditingElementStyle="{StaticResource CellEditor}" />
+                <DataGridTextColumn Header="Comentario" Width="1.5*"
+                                    Binding="{Binding Comment}"
+                                    EditingElementStyle="{StaticResource CellEditor}" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

@@ -95,7 +95,7 @@ namespace TreasuryToolkit.Infra.Services
         /// Cuts a raw vendor string at the first adjacent field label or legal-entity suffix
         /// (SA DE CV, S DE RL DE CV, SAPI DE CV, SC...), keeping only the company's core name.
         /// </summary>
-        private static string StripCompanySuffix(string rawVendorName) =>
+        internal static string StripCompanySuffix(string rawVendorName) =>
             Regex.Split(rawVendorName,
                 @"(?:RFC|Banco|Monto|Importe|Motivo|Concepto|Dato\s*no\s*verificado" +
                 @"|\bMEXICOS\s*DERL\b" +                 // Explicitly targets a known problem string
@@ -114,7 +114,7 @@ namespace TreasuryToolkit.Infra.Services
             || !string.IsNullOrWhiteSpace(row.Currency)
             || !string.IsNullOrWhiteSpace(row.Date);
 
-        private static string CleanseAndHealText(string rawText)
+        internal static string CleanseAndHealText(string rawText)
         {
             if (string.IsNullOrEmpty(rawText)) return string.Empty;
 
@@ -134,7 +134,7 @@ namespace TreasuryToolkit.Infra.Services
             return cleaned;
         }
 
-        private static void ExtractPdfDataPoints(string rawPdfText, out string amount, out string vendorName, out string reason, out string currency, out string date)
+        internal static void ExtractPdfDataPoints(string rawPdfText, out string amount, out string vendorName, out string reason, out string currency, out string date)
         {
             amount = string.Empty;
             vendorName = string.Empty;
@@ -185,9 +185,9 @@ namespace TreasuryToolkit.Infra.Services
             // TWO-COLUMN, VERTICALLY-CENTERED LAYOUT (interbank transfer receipts)
             // Both "Titular de la cuenta:" labels share one line and each name wraps around it, so the
             // text extractor interleaves the two columns line by line, e.g.:
-            //     CARL BECHEM MEXICO L                                            <- ordering, line 1
-            //     EUROPARTNERS MEXICO SA                                          <- beneficiary, line 1
-            //     Titular de la cuenta: UBRICATION TECHNOLOG Y S Titular de la cuenta:
+            //     EMPRESA DEMO MEXICO I                                           <- ordering, line 1
+            //     PROVEEDOR EJEMPLO SA                                            <- beneficiary, line 1
+            //     Titular de la cuenta: NDUSTRIAL SERVICIO S Titular de la cuenta:
             //     DE CV                                                           <- beneficiary, line 2
             //     DE RL DE CV                                                     <- ordering, line 3
             // The 2nd label ends its line, so the generic pattern would grab "DE CV" from the next
@@ -236,7 +236,7 @@ namespace TreasuryToolkit.Infra.Services
             // Some receipts print "Nombre del beneficiario: Dato no verificado por esta institución"
             // with no name after the label at all — the real payee name instead sits on its own line
             // above the label's line (the label itself is often preceded on that line by other text,
-            // e.g. "Asunto beneficiario: 021180070037622911 Nombre del beneficiario: ..."). Only kicks
+            // e.g. "Asunto beneficiario: 000000000000000000 Nombre del beneficiario: ..."). Only kicks
             // in when nothing above found a name.
             if (string.IsNullOrWhiteSpace(vendorName))
             {
@@ -334,7 +334,7 @@ namespace TreasuryToolkit.Infra.Services
             #endregion
         }
 
-        private static string CleanVendorName(string rawVendor)
+        internal static string CleanVendorName(string rawVendor)
         {
             if (string.IsNullOrWhiteSpace(rawVendor)) return string.Empty;
 

@@ -1,0 +1,24 @@
+Banca Electronica
+Fecha y hora de consulta:  15/01/2026 10:30:00  PM Contrato: 00000001
+Nombre del Cliente: EMPRESA DEMO MEXICO S DE RL DE CV
+  Banca Electronica - Pago CIE
+Operación autorizada
+Datos del firmante
+Usuario:  USR00001 Poder:  50%
+Datos de la operación
+Tipo de operación: Grupo Pago CIE
+  Descripción: PAGOS S12  Importe: 456.78
+  Cuenta de retiro: 000000000100000001  Cuenta de depósito: 00000004
+  Divisa de la cuenta: MXP  Divisa de la cuenta: MXP
+  Titular de la cuenta: EMPRESA DEMO MEXICO S DE RL  Titular de la cuenta: MENSAJERIA RAPIDA MEXICO S A DE
+DE CV CV
+  Fecha de creación: 14/01/2026  Fecha de aplicación: 15/01/2026
+  Guía CIE: 9000001  Referencia CIE: 1234567890
+  Concepto CIE: 1234567890
+Datos de confirmación de la transferencia
+  Folio de firma: 1000000001  Folio único: X000000000000000000000000001
+Estado operación
+  Porcentaje firmado: 100%  Estado: Operado
+  BANCO EJEMPLO, S.A., INSTITUCION DE BANCA MULTIPLE
+  Internet
+  www.banco-ejemplo.mx

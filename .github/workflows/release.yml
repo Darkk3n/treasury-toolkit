@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    # We use a standard Windows runner because we are compiling a WinForms application
+    # We use a standard Windows runner because we are compiling a WPF application
     runs-on: windows-latest
 
     steps:
@@ -49,10 +49,14 @@ jobs:
     - name: Restore Dependencies
       run: dotnet restore
 
-    # Step 5: Build + stage raw assemblies. Obfuscation runs automatically here via the
-    # ObfuscateAssemblies MSBuild target (TreasuryToolkit.App.csproj, AfterTargets="Build",
-    # Configuration=Release) which invokes Obfuscar against $(TargetDir) using
-    # TreasuryToolkit.App/obfuscar.xml before these files get copied to ./staging.
+    # Step 4b: Run the parser tests (TreasuryToolkit.Infra.Tests) before anything is built for release,
+    # so a change that breaks field extraction never gets signed or published. global.json opts
+    # dotnet test into Microsoft.Testing.Platform, which xUnit v3 needs on the .NET 10 SDK.
+    - name: Run Tests
+      run: dotnet test --project TreasuryToolkit.Infra.Tests/TreasuryToolkit.Infra.Tests.csproj -c Release --no-restore
+
+    # Step 5: Build + stage raw assemblies of the WPF app (TreasuryToolkit.Wpf.App). It is deliberately
+    # not obfuscated: bindings resolve ViewModel property names at runtime, so obfuscation would break them.
     # PublishReadyToRun=true must be passed here too (not just on the --no-build publish below)
     # so this step's restore resolves the win-x64 crossgen2 package; --no-build implies
     # --no-restore, so the later step can't fetch it on its own (NETSDK1094 otherwise).
@@ -60,13 +64,25 @@ jobs:
     # exe agree. (The csproj keeps the commit sha out of the Product Version.)
     - name: Stage Unbundled Binaries
       run: |
-        dotnet publish TreasuryToolkit.App/TreasuryToolkit.App.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=false /p:PublishReadyToRun=true /p:Version=$env:VERSION /p:AssemblyVersion="$env:VERSION_PREFIX.0" /p:FileVersion="$env:VERSION_PREFIX.0" -o ./staging
+        dotnet publish TreasuryToolkit.Wpf.App/TreasuryToolkit.Wpf.App.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=false /p:PublishReadyToRun=true /p:Version=$env:VERSION /p:AssemblyVersion="$env:VERSION_PREFIX.0" /p:FileVersion="$env:VERSION_PREFIX.0" -o ./staging
 
-    # Step 6: Bundle the already-obfuscated build output into a single .exe (--no-build reuses
-    # the output from the step above, so it does not re-run Compile/obfuscation).
+    # Step 6: Bundle the build output from the step above into a single .exe (--no-build reuses it).
+    # IncludeNativeLibrariesForSelfExtract=true is required for WPF: without it, its native DLLs
+    # (wpfgfx_cor3, PresentationNative_cor3, D3DCompiler_47_cor3, ...) are left next to the exe instead
+    # of inside it, and the exe can't start on its own.
     - name: Compile Single Executable Suite
       run: |
-        dotnet publish TreasuryToolkit.App/TreasuryToolkit.App.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:PublishReadyToRun=true /p:Version=$env:VERSION /p:AssemblyVersion="$env:VERSION_PREFIX.0" /p:FileVersion="$env:VERSION_PREFIX.0" --no-build -o ./publish
+        dotnet publish TreasuryToolkit.Wpf.App/TreasuryToolkit.Wpf.App.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:PublishReadyToRun=true /p:Version=$env:VERSION /p:AssemblyVersion="$env:VERSION_PREFIX.0" /p:FileVersion="$env:VERSION_PREFIX.0" --no-build -o ./publish
+
+    # Fail early if anything besides the exe was left behind (e.g. a native DLL that wasn't bundled);
+    # the zip below only ships TreasuryToolkit.exe, so such a file would be silently missing for users
+    - name: Check Single-File Output
+      run: |
+        $extra = Get-ChildItem ./publish -File | Where-Object { $_.Name -ne 'TreasuryToolkit.exe' -and $_.Extension -ne '.pdb' }
+        if ($extra) {
+          Write-Error "Files left next to the exe: $($extra.Name -join ', ')"
+          exit 1
+        }
 
     # Step 7: 🔏 CODE SIGN THE PUBLISHED EXECUTABLE 🔏
     - name: Code Sign Executable
@@ -92,11 +108,13 @@ jobs:
         name: TreasuryToolkit-${{ env.VERSION }}
         path: ./publish/TreasuryToolkit.zip
 
-    # Step 9: Automatically create a GitHub Release and upload the zipped .exe file
+    # Step 9: Automatically create a GitHub Release and upload the zipped .exe file. Tags with a suffix
+    # (v2.0.0-beta.1) become prereleases, so they never show up as the latest release.
     - name: Create GitHub Release
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v2
       with:
         files: ./publish/TreasuryToolkit.zip
+        prerelease: ${{ contains(github.ref_name, '-') }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
