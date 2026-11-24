@@ -48,8 +48,6 @@ namespace TreasuryToolkit.Wpf.App.ViewModels
             Clean();
         }
 
-        public string Title => "Renombrador de PDFs";
-
         /// <summary>First entry of the company list, shown until a company is picked (v1's "-- SELECCIONE --").</summary>
         public CompanyModel PlaceholderCompany { get; } = new() { Id = string.Empty, Name = "-- SELECCIONE --" };
 

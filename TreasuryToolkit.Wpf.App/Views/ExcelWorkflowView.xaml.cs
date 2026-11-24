@@ -2,9 +2,9 @@ using System.Windows.Controls;
 
 namespace TreasuryToolkit.Wpf.App.Views
 {
-    public partial class PlaceholderView : UserControl
+    public partial class ExcelWorkflowView : UserControl
     {
-        public PlaceholderView()
+        public ExcelWorkflowView()
         {
             InitializeComponent();
         }

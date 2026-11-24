@@ -2,9 +2,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace TreasuryToolkit.Wpf.App.ViewModels
 {
-    /// <summary>Excel tool. Placeholder until phase 4 ports UcExcelWorkflowAutomator.</summary>
+    /// <summary>
+    /// Excel tool. v1's UcExcelWorkflowAutomator has no behavior yet (its buttons have no handlers), so this is
+    /// empty for now; commands and the grid's rows go here once the module is developed.
+    /// </summary>
     public partial class ExcelWorkflowViewModel : ObservableObject
     {
-        public string Title => "Excel";
     }
 }

@@ -20,12 +20,12 @@
     <Window.Resources>
         <conv:EnumToBooleanConverter x:Key="EnumToBoolean" />
 
-        <!-- Each section's ViewModel is rendered by its view; the Excel tool is a placeholder until phase 4 -->
+        <!-- Each section's ViewModel is rendered by its view -->
         <DataTemplate DataType="{x:Type vm:FileRenamerViewModel}">
             <views:FileRenamerView />
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:ExcelWorkflowViewModel}">
-            <views:PlaceholderView />
+            <views:ExcelWorkflowView />
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:AboutViewModel}">
             <views:AboutView />
