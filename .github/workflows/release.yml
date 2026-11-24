@@ -49,6 +49,12 @@ jobs:
     - name: Restore Dependencies
       run: dotnet restore
 
+    # Step 4b: Run the parser tests (TreasuryToolkit.Infra.Tests) before anything is built for release,
+    # so a change that breaks field extraction never gets signed or published. global.json opts
+    # dotnet test into Microsoft.Testing.Platform, which xUnit v3 needs on the .NET 10 SDK.
+    - name: Run Tests
+      run: dotnet test --project TreasuryToolkit.Infra.Tests/TreasuryToolkit.Infra.Tests.csproj -c Release --no-restore
+
     # Step 5: Build + stage raw assemblies of the v2 WPF app (TreasuryToolkit.Wpf.App). Unlike the v1
     # project, it has no Obfuscar target (bindings resolve ViewModel property names at runtime, so
     # obfuscation would break them).
