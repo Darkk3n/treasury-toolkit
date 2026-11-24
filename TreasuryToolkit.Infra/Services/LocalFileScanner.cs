@@ -185,9 +185,9 @@ namespace TreasuryToolkit.Infra.Services
             // TWO-COLUMN, VERTICALLY-CENTERED LAYOUT (interbank transfer receipts)
             // Both "Titular de la cuenta:" labels share one line and each name wraps around it, so the
             // text extractor interleaves the two columns line by line, e.g.:
-            //     CARL BECHEM MEXICO L                                            <- ordering, line 1
-            //     EUROPARTNERS MEXICO SA                                          <- beneficiary, line 1
-            //     Titular de la cuenta: UBRICATION TECHNOLOG Y S Titular de la cuenta:
+            //     EMPRESA DEMO MEXICO I                                           <- ordering, line 1
+            //     PROVEEDOR EJEMPLO SA                                            <- beneficiary, line 1
+            //     Titular de la cuenta: NDUSTRIAL SERVICIO S Titular de la cuenta:
             //     DE CV                                                           <- beneficiary, line 2
             //     DE RL DE CV                                                     <- ordering, line 3
             // The 2nd label ends its line, so the generic pattern would grab "DE CV" from the next
@@ -236,7 +236,7 @@ namespace TreasuryToolkit.Infra.Services
             // Some receipts print "Nombre del beneficiario: Dato no verificado por esta institución"
             // with no name after the label at all — the real payee name instead sits on its own line
             // above the label's line (the label itself is often preceded on that line by other text,
-            // e.g. "Asunto beneficiario: 021180070037622911 Nombre del beneficiario: ..."). Only kicks
+            // e.g. "Asunto beneficiario: 000000000000000000 Nombre del beneficiario: ..."). Only kicks
             // in when nothing above found a name.
             if (string.IsNullOrWhiteSpace(vendorName))
             {

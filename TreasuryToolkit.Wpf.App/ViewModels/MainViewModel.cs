@@ -50,6 +50,12 @@ namespace TreasuryToolkit.Wpf.App.ViewModels
 #pragma warning restore MVVMTK0034
         }
 
+        /// <summary>
+        /// Shows the Excel entry in the sidebar. Off for now because the Excel tool is on hold; the view,
+        /// ViewModel and DI registration are left in place, so turning it back on is just flipping this to true.
+        /// </summary>
+        public bool IsExcelToolEnabled => false;
+
         public object CurrentViewModel => SelectedSection switch
         {
             AppSection.ExcelTool => excelWorkflow,

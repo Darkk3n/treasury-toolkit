@@ -19,6 +19,7 @@
 
     <Window.Resources>
         <conv:EnumToBooleanConverter x:Key="EnumToBoolean" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
 
         <!-- Each section's ViewModel is rendered by its view -->
         <DataTemplate DataType="{x:Type vm:FileRenamerViewModel}">
@@ -68,6 +69,7 @@
                                  GroupName="Navigation"
                                  Tag="&#xF0E2;"
                                  Content="Excel"
+                                 Visibility="{Binding IsExcelToolEnabled, Converter={StaticResource BoolToVisibility}}"
                                  IsChecked="{Binding SelectedSection, Converter={StaticResource EnumToBoolean}, ConverterParameter={x:Static vm:AppSection.ExcelTool}}"
                                  ToolTip="Excel"
                                  ToolTipService.IsEnabled="{Binding IsSidebarCollapsed}" />
