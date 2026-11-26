@@ -13,6 +13,9 @@ namespace TreasuryToolkit.Wpf.App.Services
         /// <summary>Yes/No question. Returns true for Yes.</summary>
         bool Confirm(string message, string title);
 
+        /// <summary>Yes/No question shown with the warning icon. Returns true for Yes.</summary>
+        bool ConfirmWarning(string message, string title);
+
         /// <summary>Retry/Cancel prompt (e.g. a file in use). Returns true for Retry.</summary>
         bool AskRetry(string message, string title);
 

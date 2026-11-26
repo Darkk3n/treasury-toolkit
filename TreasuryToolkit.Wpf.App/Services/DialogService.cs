@@ -16,6 +16,8 @@ namespace TreasuryToolkit.Wpf.App.Services
 
         public bool Confirm(string message, string title) => ShowMessage(message, title, MessageKind.Question, "Sí", "No");
 
+        public bool ConfirmWarning(string message, string title) => ShowMessage(message, title, MessageKind.Warning, "Sí", "No");
+
         public bool AskRetry(string message, string title) => ShowMessage(message, title, MessageKind.Warning, "Reintentar", "Cancelar");
 
         public string PickFolder(string title, string initialFolder = null)

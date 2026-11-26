@@ -27,6 +27,9 @@ namespace TreasuryToolkit.Infra.Services
                     // Rows are held back one page so a following continuation page can be folded into them.
                     ScannedPaymentData pendingRow = null;
 
+                    // Read from page 1 only and copied onto every row of the file
+                    string clientName = null;
+
                     for (int pageNum = 1; pageNum <= totalPages; pageNum++)
                     {
                         if (totalPages > 1)
@@ -35,6 +38,11 @@ namespace TreasuryToolkit.Infra.Services
                         }
 
                         string pageText = PdfTextExtractor.GetTextFromPage(pdfDoc.GetPage(pageNum));
+
+                        if (pageNum == 1)
+                        {
+                            clientName = ExtractClientName(pageText);
+                        }
 
                         string amount = string.Empty, vendor = string.Empty, concept = string.Empty, currency = string.Empty, date = string.Empty;
                         if (!string.IsNullOrWhiteSpace(pageText))
@@ -69,7 +77,8 @@ namespace TreasuryToolkit.Infra.Services
                             Vendor = vendor,
                             Concept = concept,
                             Amount = amount,
-                            Currency = currency
+                            Currency = currency,
+                            ClientName = clientName
                         };
                     }
 
@@ -106,6 +115,48 @@ namespace TreasuryToolkit.Infra.Services
                 @"|\bS\s*DE?R?L?\b" +                    // Catches "S DERL" or "S DE RL"
                 @"|\bSC\b)",                             // Isolated SC boundary
                 RegexOptions.IgnoreCase)[0];
+
+        /// <summary>
+        /// The account holder the receipt was issued to, with whitespace collapsed, or null when none is found:
+        /// <list type="number">
+        /// <item>"Nombre del Cliente:" (top of the page), value on the label's line.</item>
+        /// <item>"Nombre del Ordenante:" (middle of the page, under the charge details), value on the label's
+        /// line, or else on the line right above it: in some layouts the name is vertically centered next to
+        /// the label and the text extractor emits it first, e.g.
+        /// <c>EMPRESA DEMO SA DE CV</c> / <c>Nombre del Ordenante:</c>.</item>
+        /// </list>
+        /// </summary>
+        internal static string ExtractClientName(string pageText)
+        {
+            if (string.IsNullOrWhiteSpace(pageText)) return null;
+
+            Match clientMatch = Regex.Match(pageText, @"Nombre\s+del\s+Cliente:[ \t]*([^\r\n]+)", RegexOptions.IgnoreCase);
+            if (clientMatch.Success)
+            {
+                return CollapseWhitespace(clientMatch.Groups[1].Value);
+            }
+
+            Match ordererInlineMatch = Regex.Match(pageText, @"Nombre\s+del\s+Ordenante:[ \t]*([^\r\n]+)", RegexOptions.IgnoreCase);
+            if (ordererInlineMatch.Success)
+            {
+                return CollapseWhitespace(ordererInlineMatch.Groups[1].Value);
+            }
+
+            // Label alone on its line: the name is the line above, unless that line is another "Label: value" field
+            Match ordererAboveMatch = Regex.Match(pageText, @"([^\r\n]+)\r?\n[ \t]*Nombre\s+del\s+Ordenante:[ \t]*(?:\r?\n|$)", RegexOptions.IgnoreCase);
+            if (ordererAboveMatch.Success && !ordererAboveMatch.Groups[1].Value.Contains(':'))
+            {
+                return CollapseWhitespace(ordererAboveMatch.Groups[1].Value);
+            }
+
+            return null;
+        }
+
+        private static string CollapseWhitespace(string text)
+        {
+            string collapsed = Regex.Replace(text, @"\s+", " ").Trim();
+            return collapsed.Length == 0 ? null : collapsed;
+        }
 
         private static bool RowHasData(PaymentRowData row) =>
             !string.IsNullOrWhiteSpace(row.Amount)
