@@ -186,6 +186,9 @@ namespace TreasuryToolkit.Wpf.App.ViewModels
                 dialogs.ShowInfo("Proceso Completado con Éxito!", "Éxito!");
                 IsBusy = false;
 
+                // The rows point at source files that were just split and deleted, so reset the form as "Limpiar" does
+                Clean();
+
                 if (!system.TryOpen(folder, out string openError))
                 {
                     dialogs.ShowError($"No se pudo abrir la carpeta: {openError}", "Error");
