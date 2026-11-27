@@ -1,0 +1,24 @@
+Fecha: 16/01/2026
+Hora:
+01:00:00
+Pagos SPID enviados
+Página: 1
+Fecha de 
+15/01/2026 Hora de liquidación 13:00:00 MX Clave de Rastreo: DEMOSPID000001
+liquidación:
+DETALLES DEL CARGO
+Cuenta Ordenante: 0000000001
+EMPRESA DEMO MEXICO S DE RL DE
+Nombre del Ordenante:
+FI01
+Referencia del ordenante:
+Comisión cobrada: 5.00
+Moneda: USD
+Monto: 456.78
+DETALLES DEL ABONO
+Cuenta del Beneficiario: 000000000000000002 Referencia Numérica: 1
+Nombre del Beneficiario: PROVEEDOR LOGISTICO SOLUTIONS
+Banco Receptor: BANCO DEMO
+Concepto de Pago:
+FI01
+Clasificación de la Operación

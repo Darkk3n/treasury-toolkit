@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using TreasuryToolkit.Core.Contracts;
 using TreasuryToolkit.Core.Models;
+using TreasuryToolkit.Core.Text;
 using TreasuryToolkit.Wpf.App.Services;
 
 namespace TreasuryToolkit.Wpf.App.ViewModels
@@ -130,7 +131,7 @@ namespace TreasuryToolkit.Wpf.App.ViewModels
         [RelayCommand(CanExecute = nameof(IsIdle))]
         private async Task StartAsync()
         {
-            if (!ValidateStart())
+            if (!ValidateStart() || !ConfirmClientNameMismatches())
             {
                 return;
             }
@@ -223,6 +224,59 @@ namespace TreasuryToolkit.Wpf.App.ViewModels
                     }
                 }
             }
+        }
+
+        /// <summary>Client names on receipts that are never checked against the selected company.</summary>
+        private static readonly string[] ClientNamesExemptFromCheck = ["CARL BECHEM"];
+
+        /// <summary>
+        /// Companies whose receipts carry a client name that doesn't contain their company-list name
+        /// (e.g. "EMPRESA DEMO DE MEXICO SA DE CV" for "EMPRESA DEMO MX"); any of these names is accepted instead.
+        /// </summary>
+        private static readonly Dictionary<string, string[]> ReceiptClientNamesByCompany = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["IMMOPRETT MX"] = ["IMMOPRETT DE MEXICO"],
+            ["IMMOPRETT QRO"] = ["IMMOPRETT QUERETARO"],   // as reported; no sample receipt yet
+        };
+
+        private static bool ClientNameMatchesCompany(string clientName, string companyName) =>
+            CompanyNameMatcher.Contains(clientName, companyName)
+            || (ReceiptClientNamesByCompany.TryGetValue(companyName, out string[] receiptNames)
+                && receiptNames.Any(name => CompanyNameMatcher.Contains(clientName, name)));
+
+        /// <summary>
+        /// Warns when a file's client name ("Nombre del Cliente" / "Nombre del Ordenante" / "Contrato", first page)
+        /// doesn't contain the selected company's name (or one of its <see cref="ReceiptClientNamesByCompany"/>)
+        /// and asks whether to go on anyway. Files without any of those labels, files whose client is in
+        /// <see cref="ClientNamesExemptFromCheck"/>, and hand-added rows are not checked. Returns true to continue.
+        /// </summary>
+        private bool ConfirmClientNameMismatches()
+        {
+            const int MaxListed = 10;
+
+            var mismatches = Rows
+                .Where(r => !string.IsNullOrEmpty(r.FileName) && !string.IsNullOrEmpty(r.ClientName))
+                .DistinctBy(r => r.FileName)
+                .Where(r => !ClientNamesExemptFromCheck.Any(exempt => CompanyNameMatcher.Contains(r.ClientName, exempt)))
+                .Where(r => !ClientNameMatchesCompany(r.ClientName, SelectedCompany.Name))
+                .Select(r => $"• {r.FileName}: {r.ClientName}")
+                .ToList();
+
+            if (mismatches.Count == 0)
+            {
+                return true;
+            }
+
+            string list = string.Join(Environment.NewLine, mismatches.Take(MaxListed));
+            if (mismatches.Count > MaxListed)
+            {
+                list += $"{Environment.NewLine}... y {mismatches.Count - MaxListed} más";
+            }
+
+            return dialogs.ConfirmWarning(
+                $"El nombre del cliente no coincide con la empresa seleccionada ({SelectedCompany.Name}) en {mismatches.Count} archivo(s):"
+                + $"{Environment.NewLine}{Environment.NewLine}{list}{Environment.NewLine}{Environment.NewLine}¿Desea continuar de todos modos?",
+                "Advertencia");
         }
 
         private bool ValidateStart()

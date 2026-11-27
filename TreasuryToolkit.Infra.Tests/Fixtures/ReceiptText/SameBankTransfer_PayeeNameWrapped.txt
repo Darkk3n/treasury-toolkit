@@ -1,0 +1,22 @@
+Banca Electronica
+Fecha y hora de consulta:  15/01/2026 10:30:00  PM Contrato: 00000001
+Nombre del Cliente: EMPRESA DEMO MEXICO S DE RL DE CV
+  Banca Electronica - Pago Mismo Banco
+Operación autorizada
+Datos del firmante
+Usuario:  USUARIO1 Poder:  50%
+Datos de la operación
+Tipo de operación: Grupo Pago Mismo Banco
+  Descripción: REEMBOLSOS W03  Importe: 4,321.09
+  Cuenta de retiro: 000000000000000001  Cuenta de depósito: 0000000002
+  Divisa de la cuenta: MXP  Divisa de la cuenta: MXP
+  Titular de la cuenta: EMPRESA DEMO MEXICO S DE RL DE  Titular de la cuenta: MARIA ELENA GOMEZ DE LA
+CV ROSA
+  Fecha de creación: 15/01/2026  Fecha de aplicación: 15/01/2026
+  Hora de captura en el canal: 12:00:00  Motivo de pago: REEMBOLSO
+Datos de confirmación de la transferencia
+  Folio de firma: 0000000001  Folio único: I000000000000000000000000000
+Estado operación
+  Porcentaje firmado: 100%  Estado: Operado
+  BANCO DEMO, S.A., INSTITUCION DE BANCA MULTIPLE
+  Internet

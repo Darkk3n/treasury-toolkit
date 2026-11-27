@@ -1,0 +1,23 @@
+Comprobante de Operación
+Tipo de
+Operación:  TRANSFERENCIA MISMO BANCO
+Contrato:  EMPRESA DEMO INSTALACIONES MEXICO S DE RL 000012345678
+Usuario:  00000001 -
+Referencia:  12345
+Referencias del
+Movimiento:  0000012345
+Estado:  EJECUTADO
+Divisa:  MXN
+Cuenta Cargo:  00000000001 - EMPRESA DEMO INSTALACIONES MEXICO S DE RLDE CV
+Cuenta Abono:  00000000002 - 100 JUAN PEREZ LOPEZ NOM
+Importe:  $ 1,234.56 MXN
+Concepto:  REEMBOLSO DE GASTOS SEM 03
+Fecha
+aplicación:  15/01/2026
+RFC
+Beneficiario:  
+Importe IVA:  
+Email del
+Beneficiario:  
+Operación realizada por internet
+Para dudas o aclaraciones por favor llame a:

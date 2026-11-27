@@ -1,0 +1,28 @@
+Banca Electronica
+Fecha y hora de consulta:  15/01/2026 10:30:00  PM Contrato: 00000001
+Nombre del Cliente: EMPRESA DEMO MEXICO SOLUCIONES ELECTRICAS
+S DE RL DE CV
+  Banca Electronica - Pago Internacional
+Operación autorizada
+Datos del firmante
+Usuario:  USUARIO1 Poder:  50%
+Datos de la operación
+Tipo de operación: Grupo Pago Internacional
+  Descripción: PAGOS SEM 03
+  Fecha de creación: 15/01/2026  Fecha de aplicación: 15/01/2026
+  Cuenta de retiro: 000000000000000001  Cuenta de depósito: DE00000000000000000002
+  Titular de la cuenta: EMPRESA DEMO MEXICO SOLUCI ONES  Titular de la cuenta: PROVEEDOR EUROPA GMBH
+ELECTRICAS S DE RL DE CV
+  Código banco beneficiario: DEMODEF1XXX  Dirección de beneficiario: CALLE EJEMPLO 1 00000 CIUDAD
+CIUDAD EJEMPLO
+  Banco destino: BANCO EUROPA DEMO  Pais de beneficiario: GERMANY
+  Dirección Banco Destino CIUDAD, CALLE EJEMPLO
+  Importe a cargar: 1,234.56 USD  Importe a enviar: 1,000.00 EUR
+  Tipo de Cambio a la compra: 16.00000  Tipo de cambio a la venta: 20.00000
+  Detalle de pago: INVOICE 0000000001
+Datos de confirmación de la transferencia
+  Folio extranjero: 0000001  Folio único: I000000000000000000000000000
+Estado operación
+  Porcentaje firmado: 100%  Estado: Operado
+  BANCO DEMO, S.A., INSTITUCION DE BANCA MULTIPLE
+  Internet

@@ -1,0 +1,22 @@
+Fecha: 15/01/2026
+Hora:
+09:00:00
+Pagos SPEI enviados
+Página: 1
+Fecha valor 15/01/2026 Clave de Rastreo: DEMO000001
+Fecha de liquidación: 15/01/2026 Hora de liquidación: 10:30:00 MX
+DETALLES DEL CARGO
+Cuenta Ordenante: 0000000001
+EMPRESA DEMO MEXICO S DE RL DE
+Nombre del Ordenante:
+0000000000000001
+Referencia del ordenante:
+Comisión cobrada: 8.00
+Moneda: MXN
+Monto: 345.67
+DETALLES DEL ABONO
+Cuenta del Beneficiario: 000000000000000002 Referencia Numérica: 1
+Nombre del Beneficiario: MENSAJERIA GLOBAL MEXICO Y C
+Banco Receptor: BANCO DEMO
+Concepto de Pago: FDO0000001
+*****Emitido por: Banco Demo, S.A., Institución de Banca Múltiple*****

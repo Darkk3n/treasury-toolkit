@@ -51,6 +51,7 @@ namespace TreasuryToolkit.Wpf.App.ViewModels
             // Kept exactly as scanned: when a page can't be read the scanner puts the error message here
             amount = scanned.Amount;
             PageCount = scanned.PageCount;
+            ClientName = scanned.ClientName;
         }
 
         /// <summary>
@@ -66,6 +67,9 @@ namespace TreasuryToolkit.Wpf.App.ViewModels
 
         /// <summary>Consecutive source pages this row covers (continuation pages stay with their receipt).</summary>
         public int PageCount { get; } = 1;
+
+        /// <summary>"Nombre del Cliente" from the source file's first page; null for hand-added rows or when absent.</summary>
+        public string ClientName { get; }
 
         public PaymentRowData ToPaymentRowData() => new()
         {
