@@ -1,0 +1,39 @@
+15/01/26, 1:00 p.m. Comprobante Pago Interbancario
+Cerrar Guardar Imprimir
+Fecha y hora de consulta 15/01/2026 1:00:00 PM Contrato 00000001
+EMPRESA DEMO MEXICO
+Nombre del Cliente INDUSTRIAL SERVICIOS S
+DE RL
+Banca Electronica - Pagos Interbancarios
+Operación autorizada
+Transferencia en proceso de validación y aplicación.
+Datos del firmante
+Usuario: USUARIO1 Poder: 50%
+Datos de la operación
+Tipo de operación: Pago Interbancario
+Descripción: PAGO DEMO Importe de la operación: 2,345.00 USD
+Cuenta de retiro: 0000000001 Cuenta de depósito: 000000000000000002
+Divisa de la cuenta: USD Divisa de la cuenta: USD
+EMPRESA DEMO MEXICO I
+PROVEEDOR EJEMPLO MEXICO SA
+Titular de la cuenta: NDUSTRIAL SERVICIO S S Titular de la cuenta:
+DE CV
+DE RL DE CV
+CALLE EJEMPLO
+Dirección del ordenante: NUMERO 1 CENTRO RFC del ordenante: EDM010101AAA
+CIUDAD EJEMPLO
+AVENIDA EJEMPLO 1
+Dirección del Beneficiario: Col. CENTRO RFC del Beneficiario: PEM010101AAA
+CP 00000 ESTADO
+Clasificación de la operación: Otro  
+Nombre banco destino: BANCO DEMO
+Fecha de creación: 15/01/2026 Fecha de aplicación: 15/01/2026
+Concepto de pago: FCUS000001 Referencia numérica: 00000000000000000001
+Instrumento de seguridad: ASD 0000000000 Hora de captura en el canal: 13:00:00
+Datos de confirmación de la transferencia
+Folio interbancario: 0000000001 Clave de rastreo: 000000000000000000000001
+Folio de firma: 0000000001 Folio único: I000000000000000000000000000
+Estado operación
+Porcentaje Firmado: 100% Estado: Operado
+Detalle de firmas
+Acción Usuario Porcentaje aportado Fecha

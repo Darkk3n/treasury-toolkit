@@ -1,0 +1,22 @@
+Fecha: 15/01/2026
+Hora:
+09:00:00
+Transferencias a terceros
+Página: 1
+Fecha valor 15/01/2026 Número de referencia de la instrucción: DEMO0000001
+Fecha de liquidación: 15/01/2026 Hora de liquidación: 10:30:00 MX
+DETALLES DEL CARGO
+Cuenta Ordenante: 0000000001
+EMPRESA DEMO MEXICO S DE RL DE
+Nombre del Ordenante:
+123456
+Referencia del ordenante:
+Comisión cobrada: 0.35
+Moneda: USD
+Monto: 1,234.56
+DETALLES DEL ABONO
+Cuenta del Beneficiario: 0000000002 Tipo de Transacción: Terceros
+Nombre del Beneficiario: EVENTOS EJEMPLO SAPI DE CV Tipo de Cambio:
+Banco Receptor: BANCO DEMO
+Referencia del Beneficiario: 123456
+*****Emitido por: Banco Demo, S.A., Institución de Banca Múltiple*****

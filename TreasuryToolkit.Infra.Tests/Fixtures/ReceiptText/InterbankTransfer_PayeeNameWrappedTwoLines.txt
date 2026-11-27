@@ -1,0 +1,27 @@
+Banca Electronica
+Fecha y hora de consulta:  15/01/2026 10:30:00  PM Contrato: 00000001
+Nombre del Cliente: EMPRESA DEMO MEXICO INDUSTRIAL
+TECHNOLOGY S DE RL
+  Banca Electronica - Pago Interbancario
+Operación autorizada
+Datos del firmante
+Usuario:  USUARIO1 Poder:  100%
+Datos de la operación
+Tipo de operación: Grupo Pago Interbancario
+  Descripción: PAGOS W03  Importe: 8,765.43
+  Cuenta de retiro: 000000000000000001  Cuenta de depósito: 000000000000000002
+  Divisa de la cuenta: MXP  Divisa de la cuenta: MXP
+  Titular de la cuenta: EMPRESA DEMO MEXICO I  Titular de la cuenta: ARRENDADORA EJEMPLO DEL
+NDUSTRIAL TECHNOLOG Y S DE CENTRO
+RL DE CV Dato no verificado por esta institución
+  Banco beneficiario: BANCO DEMO  Disponibilidad de pago: Mismo día
+  Fecha de creación: 15/01/2026  Fecha de aplicación: 15/01/2026
+  Concepto de pago: RQRO0001 0002 03  Referencia:
+  Hora de captura en el canal: 13:00:00
+Datos de confirmación de la transferencia
+  Folio interbancario: 0000000001  Clave de rastreo: 000000000000000000000001
+  Folio de firma: 0000000001  Folio único: I000000000000000000000000000
+Estado operación
+  Porcentaje firmado: 100%  Estado: Operado
+  BANCO DEMO, S.A., INSTITUCION DE BANCA MULTIPLE
+  Internet

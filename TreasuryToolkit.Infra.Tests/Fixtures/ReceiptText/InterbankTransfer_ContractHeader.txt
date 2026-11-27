@@ -1,0 +1,34 @@
+Comprobante de Operación
+Tipo de
+Operación:  TRANSFERENCIA INTERBANCARIA
+Contrato:  EMPRESA DEMO DE MEXICO SA DE CV 000012345678
+Usuario:  00000001 - USUARIO DEMO
+Referencia:  1A234
+Referencia
+numérica del
+Emisor:
+Referencias del
+Movimiento:  1234567
+Estado:  EJECUTADO
+Divisa:  MXN
+Cuenta CLABE:  000000000000000001
+Cuenta Cargo:  00000000001 - EMPRESA DEMO DE MEXICO SA DE CV
+Cuenta Abono:  000000000000000002 - PEREZ Y LOPEZ ASOCIADOS
+Importe:  $ 9,876.54 MXN
+Concepto:  4321
+Fecha y hora de
+Alta:  15/01/2026 09:00:00
+Fecha y hora de
+Liquidación:  15/01/2026 10:30:00
+Clave de
+Rastreo:  00000000000000000000000000000001
+RFC
+Beneficiario:
+RFC
+Ordenante:  EDM010101AAA
+Importe IVA:
+Email del
+Beneficiario:
+Banco Destino:  BANCO DEMO
+Operación realizada por internet
+Para dudas o aclaraciones por favor llame a:

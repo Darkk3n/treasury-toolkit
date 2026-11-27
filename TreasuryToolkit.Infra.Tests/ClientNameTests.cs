@@ -19,6 +19,12 @@ namespace TreasuryToolkit.Infra.Tests
         [InlineData("Nombre del Ordenante: ACME INSTRUMENTOS SA\nMoneda: MXN", "ACME INSTRUMENTOS SA")]
         [InlineData("Cuenta Ordenante: 1234567890\nNombre del Ordenante:\nFP0001", null)]          // line above is another field
         [InlineData("Nombre del Cliente: EMPRESA DEMO\nOTRA EMPRESA\nNombre del Ordenante:", "EMPRESA DEMO")] // Cliente wins
+        // Contract label at the top, name followed by the contract number
+        [InlineData("Comprobante de Operación\nTipo de\nOperación:  TRANSFERENCIA INTERBANCARIA\nContrato:  EMPRESA DEMO DE MEXICO SA DE CV 000012345678\nUsuario:  00000001 - USUARIO DEMO", "EMPRESA DEMO DE MEXICO SA DE CV")]
+        [InlineData("Contrato:  ACME INSTRUMENTOS SA\r\nUsuario:  1", "ACME INSTRUMENTOS SA")]
+        [InlineData("Contrato:  000012345678\nUsuario:  1", null)]                                // number only
+        [InlineData("Fecha y hora de consulta:  15/01/2026 10:30:00  PM Contrato: 00000001\nCuenta: 1", null)] // mid-line, not a name
+        [InlineData("Fecha y hora de consulta:  15/01/2026  PM Contrato: 00000001\nNombre del Cliente: EMPRESA DEMO", "EMPRESA DEMO")]
         [InlineData("", null)]
         public void ExtractClientName_ReadsTheLabelValue(string pageText, string expected)
         {

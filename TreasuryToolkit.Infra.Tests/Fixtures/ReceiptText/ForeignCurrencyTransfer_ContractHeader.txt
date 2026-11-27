@@ -1,0 +1,45 @@
+Comprobante de Operación
+Tipo de
+Operación:  TRANSFERENCIA EN DIVISA A OTROS BANCOS
+Contrato:  EMPRESA DEMO DE MEXICO SA DE CV 000012345678
+Usuario:  00000001 - USUARIO DEMO
+Referencia:  000000000000000000A001
+Referencias del
+Movimiento:  0000000000001
+Estado:  EJECUTADO
+Divisa Abono:  USD
+Cuenta de
+Cargo:  00000000001 - EMPRESA DEMO DE MEXICO SA DE CV
+Cuenta de
+Abono:  0000000000002 - PROVEEDOR INTERNATIONAL INC
+Importe USD:  $ 3,456.78
+Importe Divisa:  $ 3,456.78
+Importe Cargo:  $ 3,456.78
+Fecha de
+Aplicacion:  2026/01/15
+Tipo de
+Cambio:  19.000000
+Concepto:  000000001 TRAVEL EXPENSES Q1
+Proposito:  
+RFC de
+Beneficiario:  
+Importe IVA:  0.00
+Fecha y hora de
+alta:  14/01/2026 15:00:00
+Fecha y hora de
+liquidación:  15/01/2026 14:30:00
+Banco
+receptor:  BANCO EXTRANJERO DEMO, NA
+Clave
+ABA/SWIFT:  000000000
+País:  US
+Ciudad:  CIUDAD DEMO
+Clave
+ABA/SWIFT
+intermediaria:  
+Banco
+intermediario:  
+Cuenta
+intermediaria:  
+Para dudas o aclaraciones por favor llame a:
+Operación realizada por internet
