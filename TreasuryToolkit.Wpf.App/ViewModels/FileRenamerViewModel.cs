@@ -230,10 +230,25 @@ namespace TreasuryToolkit.Wpf.App.ViewModels
         private static readonly string[] ClientNamesExemptFromCheck = ["CARL BECHEM"];
 
         /// <summary>
-        /// Warns when a file's client name ("Nombre del Cliente" / "Nombre del Ordenante", first page) doesn't
-        /// contain the selected company's name and asks whether to go on anyway. Files without either label,
-        /// files whose client is in <see cref="ClientNamesExemptFromCheck"/>, and hand-added rows are not checked.
-        /// Returns true to continue.
+        /// Companies whose receipts carry a client name that doesn't contain their company-list name
+        /// (e.g. "EMPRESA DEMO DE MEXICO SA DE CV" for "EMPRESA DEMO MX"); any of these names is accepted instead.
+        /// </summary>
+        private static readonly Dictionary<string, string[]> ReceiptClientNamesByCompany = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["IMMOPRETT MX"] = ["IMMOPRETT DE MEXICO"],
+            ["IMMOPRETT QRO"] = ["IMMOPRETT QUERETARO"],   // as reported; no sample receipt yet
+        };
+
+        private static bool ClientNameMatchesCompany(string clientName, string companyName) =>
+            CompanyNameMatcher.Contains(clientName, companyName)
+            || (ReceiptClientNamesByCompany.TryGetValue(companyName, out string[] receiptNames)
+                && receiptNames.Any(name => CompanyNameMatcher.Contains(clientName, name)));
+
+        /// <summary>
+        /// Warns when a file's client name ("Nombre del Cliente" / "Nombre del Ordenante" / "Contrato", first page)
+        /// doesn't contain the selected company's name (or one of its <see cref="ReceiptClientNamesByCompany"/>)
+        /// and asks whether to go on anyway. Files without any of those labels, files whose client is in
+        /// <see cref="ClientNamesExemptFromCheck"/>, and hand-added rows are not checked. Returns true to continue.
         /// </summary>
         private bool ConfirmClientNameMismatches()
         {
@@ -243,7 +258,7 @@ namespace TreasuryToolkit.Wpf.App.ViewModels
                 .Where(r => !string.IsNullOrEmpty(r.FileName) && !string.IsNullOrEmpty(r.ClientName))
                 .DistinctBy(r => r.FileName)
                 .Where(r => !ClientNamesExemptFromCheck.Any(exempt => CompanyNameMatcher.Contains(r.ClientName, exempt)))
-                .Where(r => !CompanyNameMatcher.Contains(r.ClientName, SelectedCompany.Name))
+                .Where(r => !ClientNameMatchesCompany(r.ClientName, SelectedCompany.Name))
                 .Select(r => $"• {r.FileName}: {r.ClientName}")
                 .ToList();
 

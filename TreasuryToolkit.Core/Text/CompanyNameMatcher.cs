@@ -17,7 +17,8 @@ namespace TreasuryToolkit.Core.Text
             return company.Length > 0 && Normalize(foundName).Contains(company, StringComparison.Ordinal);
         }
 
-        internal static string Normalize(string text)
+        /// <summary>Upper-case letters and digits only, accents removed ("S.A. de C.V." → "SADECV").</summary>
+        public static string Normalize(string text)
         {
             if (string.IsNullOrEmpty(text)) return string.Empty;
 

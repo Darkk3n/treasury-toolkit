@@ -3,6 +3,7 @@ using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 using TreasuryToolkit.Core.Contracts;
 using TreasuryToolkit.Core.Models;
+using TreasuryToolkit.Core.Text;
 
 namespace TreasuryToolkit.Infra.Services
 {
@@ -110,7 +111,9 @@ namespace TreasuryToolkit.Infra.Services
                 @"|\bMEXICOS\s*DERL\b" +                 // Explicitly targets a known problem string
                 @"|\bS\s*DE?\s*R?L?\s*DE?\s*C?V?\b" +    // Dynamic catcher for S DE RL DE CV fragments
                 @"|\bSA\s*DE\s*C?V?\b" +                 // Dynamic catcher for SA DE CV fragments
-                @"|\bS\s*A\b(?=\s*(?:DE\b|$))" +         // "SA"/"S A" cut off by a line wrap ("... SA", "... S A DE")
+                @"|\bSAB\b(?=\s*(?:DE\b|$))" +           // SAB DE CV (sociedad anónima bursátil)
+                @"|\bS\s*A\b(?=\s*(?:DE?\b|$))" +        // "SA"/"S A" cut off by a line wrap ("... SA", "... S A DE", "... SA D")
+                @"|\s[SA]\s*$" +                         // lone "S"/"A" left by a cut-off "S.A."/"S.C."/"A.C."
                 @"|\bSAPI\s*DE\s*C?V?\b" +               // Dynamic catcher for SAPI DE CV fragments
                 @"|\bS\s*DE?R?L?\b" +                    // Catches "S DERL" or "S DE RL"
                 @"|\bSC\b)",                             // Isolated SC boundary
@@ -124,6 +127,8 @@ namespace TreasuryToolkit.Infra.Services
         /// line, or else on the line right above it: in some layouts the name is vertically centered next to
         /// the label and the text extractor emits it first, e.g.
         /// <c>EMPRESA DEMO SA DE CV</c> / <c>Nombre del Ordenante:</c>.</item>
+        /// <item>"Contrato:" at the start of a line (top of the page), value on the label's line with the
+        /// trailing contract number dropped, e.g. <c>Contrato:  EMPRESA DEMO SA DE CV 000012345678</c>.</item>
         /// </list>
         /// </summary>
         internal static string ExtractClientName(string pageText)
@@ -147,6 +152,14 @@ namespace TreasuryToolkit.Infra.Services
             if (ordererAboveMatch.Success && !ordererAboveMatch.Groups[1].Value.Contains(':'))
             {
                 return CollapseWhitespace(ordererAboveMatch.Groups[1].Value);
+            }
+
+            // Only at the start of a line: other layouts carry a bare "... Contrato: 00000001" mid-line
+            Match contractMatch = Regex.Match(pageText, @"^[ \t]*Contrato:[ \t]*([^\r\n]+)", RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            if (contractMatch.Success)
+            {
+                // The contract number follows the name
+                return CollapseWhitespace(Regex.Replace(contractMatch.Groups[1].Value, @"(?:^|\s+)\d{4,}\s*$", ""));
             }
 
             return null;
@@ -174,7 +187,16 @@ namespace TreasuryToolkit.Infra.Services
 
             // 2. Fix inner-word splitting issues (e.g., " SERVICI OS" or "QUERETA RO")
             // This looks for an isolated trailing part of a word and welds it back to its core.
-            cleaned = Regex.Replace(cleaned, @"([A-Za-z]+)\s([A-Za-z]{1,2}\b)", "$1$2");
+            // Short Spanish words ("REEMBOLSO DE GASTOS", "DISENO EN", "PROVEEDOR Y ASOCIADOS", "COMERCIAL E
+            // INDUSTRIAL") are not word fragments, so they are left alone: neither welded onto the word before
+            // them nor taking the next fragment ("... MEXICO Y C" stays as is).
+            const string shortWords = "(?:DE|EN|LA|EL|AL|Y|E)";
+
+            // 2a. A fragment followed by a single letter is one word split in two ("NE W" → "NEW",
+            // "D E" → "DE"), so they are joined to each other rather than the fragment to the word before it
+            cleaned = Regex.Replace(cleaned, $@"\b(?!{shortWords}\s)([A-Za-z]{{1,2}})\s(?!Y\b)([A-Za-z])\b", "$1$2", RegexOptions.IgnoreCase);
+
+            cleaned = Regex.Replace(cleaned, $@"\b(?!{shortWords}\s)([A-Za-z]+)\s(?!{shortWords}\b)([A-Za-z]{{1,2}}\b)", "$1$2", RegexOptions.IgnoreCase);
 
             // 3. Fix words split by massive gaps (e.g., "LOGISTI   CO")
             cleaned = Regex.Replace(cleaned, @"([A-Za-z]+)\s{2,}([A-Za-z]+)", "$1$2");
@@ -197,7 +219,8 @@ namespace TreasuryToolkit.Infra.Services
             // This pattern captures "Importe:", any spaces, and numbers formatted like 12,345.00
             // The \. ensures it looks for a literal period right before the cents
             #region Amount
-            string amountPattern = @"(?:Importe(?:\s+a\s+enviar|\s+de\s+la\s+operaci[ó]n)?|Monto):\s*(?:\$\s*)?([0-9]{1,3}(?:,[0-9]{3})*\.[0-9]{2}|[0-9]+\.[0-9]{2})";
+            // "Importe Divisa:" is the amount in foreign-currency transfers (next to "Importe USD:" / "Importe Cargo:")
+            string amountPattern = @"(?:Importe(?:\s+a\s+enviar|\s+de\s+la\s+operaci[ó]n|\s+Divisa)?|Monto):\s*(?:\$\s*)?([0-9]{1,3}(?:,[0-9]{3})*\.[0-9]{2}|[0-9]+\.[0-9]{2})";
 
             Match amountMatch = Regex.Match(rawPdfText, amountPattern, RegexOptions.IgnoreCase);
             if (amountMatch.Success)
@@ -222,6 +245,15 @@ namespace TreasuryToolkit.Infra.Services
                 // Step 2: Drop the blade if the word "Referencia" exists on that line, 
                 // throwing away the reference numbers and keeping only the reason text.
                 string cleanReason = Regex.Split(rawReason, @"Referencia", RegexOptions.IgnoreCase)[0];
+
+                // A long reason wraps onto the next line(s) ("INSCRIPCION CUARTO DE" / "PRIMARIA"). Skipped when a
+                // "Referencia:" value shares the line, since the wrapped text could then be either column's.
+                if (!Regex.IsMatch(rawReason, @"Referencia[^:]*:\s*\S", RegexOptions.IgnoreCase))
+                {
+                    int reasonLineEnd = reasonMatch.Groups[1].Index + reasonMatch.Groups[1].Length;
+                    // Trimmed first: a wide gap left before "Referencia" would be read as a word split by the healer
+                    cleanReason = cleanReason.TrimEnd() + " " + string.Join(" ", WrappedReasonLinesAfter(rawPdfText, reasonLineEnd + 1));
+                }
 
                 // Step 3: Run it through the healer to fix spacing or layout bugs
                 reason = CleanseAndHealText(cleanReason);
@@ -257,13 +289,14 @@ namespace TreasuryToolkit.Infra.Services
             }
             else if (structuralMatch.Success)
             {
-                string rawVendorName = structuralMatch.Groups[1].Value;
+                string rawVendorName = structuralMatch.Groups[1].Value + WrappedPayeeNameRemainder(rawPdfText, structuralMatch);
 
-                vendorName = CleanseAndHealText(StripCompanySuffix(rawVendorName));
+                vendorName = CleanTwoColumnPayeeName(rawVendorName);
             }
             else
             {
-                string cuentaAbonoPattern = @"Cuenta\s+Abono:\s*(?:[\d\s-]+\s+)?(?:-\s+)?([A-ZÁÉÍÓÚÑ\s]+)";
+                // "Cuenta Abono:" or, in foreign-currency transfers, "Cuenta de" wrapped onto the line above "Abono:"
+                string cuentaAbonoPattern = @"Cuenta\s+(?:de\s+)?Abono:\s*(?:[\d\s-]+\s+)?(?:-\s+)?([A-ZÁÉÍÓÚÑ\s]+)";
                 Match cuentaAbonoMatch = Regex.Match(rawPdfText, cuentaAbonoPattern, RegexOptions.IgnoreCase);
 
                 if (cuentaAbonoMatch.Success)
@@ -309,7 +342,16 @@ namespace TreasuryToolkit.Infra.Services
             string currencyPattern = @"(?:Divisa(?:\s+de\s+la\s+cuenta)?|Moneda):.*?(?:Divisa(?:\s+de\s+la\s+cuenta)?|Moneda):\s*([^\r\n:]+)";
             Match currencyMatch = Regex.Match(rawPdfText, currencyPattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
-            if (currencyMatch.Success)
+            // Foreign-currency transfers: "Divisa Abono: USD" is the payment's currency. Checked first because
+            // the only other "Divisa:" on that page is "Importe Divisa:", which carries the amount.
+            Match creditCurrencyMatch = Regex.Match(rawPdfText, @"Divisa\s+Abono:[ \t]*([A-Za-z]{3})\b", RegexOptions.IgnoreCase);
+
+            if (creditCurrencyMatch.Success)
+            {
+                currency = creditCurrencyMatch.Groups[1].Value.ToUpperInvariant();
+                if (currency == "MXP") { currency = "MXN"; }
+            }
+            else if (currencyMatch.Success)
             {
                 string rawCurrency = currencyMatch.Groups[1].Value;
 
@@ -384,6 +426,135 @@ namespace TreasuryToolkit.Infra.Services
             }
             #endregion
         }
+
+        private static readonly HashSet<string> LegalSuffixWords = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "S", "SA", "DE", "RL", "C", "V", "CV", "SAPI", "SC"
+        };
+
+        /// <summary>
+        /// TWO-COLUMN LAYOUT: both "Titular de la cuenta:" labels share one line and each name wraps onto the
+        /// lines below, where the text extractor emits the ordering party's remainder first and the payee's
+        /// after it on the same line, e.g.
+        /// <c>Titular de la cuenta: EMPRESA DEMO S DE RL DE  Titular de la cuenta: ARRENDADORA EJEMPLO DEL</c> /
+        /// <c>CV CENTRO</c>. The ordering party is the client, so the leading words that continue the client's
+        /// name ("Nombre del Cliente:", wrapped lines included), plus the legal suffix up to "CV" that the
+        /// header may leave out, belong to the left column; the rest of each line is the payee's (" CENTRO").
+        /// Continuation lines start at the left margin and hold no label; the next field line is indented.
+        /// Returns an empty string when there is nothing to add.
+        /// </summary>
+        internal static string WrappedPayeeNameRemainder(string pageText, Match twoLabelMatch)
+        {
+            // Labels on separate lines are a different layout
+            if (twoLabelMatch.Value.Contains('\n')) return string.Empty;
+
+            int lineStart = pageText.LastIndexOf('\n', twoLabelMatch.Index) + 1;
+            int lineEnd = pageText.IndexOf('\n', twoLabelMatch.Index);
+            if (lineEnd < 0) return string.Empty;
+
+            Match columnsMatch = Regex.Match(pageText[lineStart..lineEnd],
+                @"(?:Titular\s+de\s+la\s+cuenta|Nombre\s+del\s+beneficiario):(.*?)(?:Titular\s+de\s+la\s+cuenta|Nombre\s+del\s+beneficiario):",
+                RegexOptions.IgnoreCase);
+            if (!columnsMatch.Success) return string.Empty;
+
+            string client = CompanyNameMatcher.Normalize(ExtractWrappedClientName(pageText));
+            string left = CompanyNameMatcher.Normalize(columnsMatch.Groups[1].Value);
+            var payee = new System.Text.StringBuilder();
+
+            foreach (string line in WrappedLinesAfter(pageText, lineEnd + 1))
+            {
+                string[] tokens = Regex.Replace(line, @"Dato\s*no\s*verificado.*$", "", RegexOptions.IgnoreCase)
+                    .Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+
+                int taken = 0;
+                while (taken < tokens.Length)
+                {
+                    string candidate = left + CompanyNameMatcher.Normalize(tokens[taken]);
+                    bool continuesClient = client.Length > 0 && client.StartsWith(candidate, StringComparison.Ordinal);
+                    bool trailingSuffix = (client.Length == 0 || left.StartsWith(client, StringComparison.Ordinal))
+                        && !left.EndsWith("CV", StringComparison.Ordinal)
+                        && LegalSuffixWords.Contains(tokens[taken]);
+
+                    if (!continuesClient && !trailingSuffix) break;
+
+                    left = candidate;
+                    taken++;
+                }
+
+                foreach (string token in tokens.Skip(taken))
+                {
+                    payee.Append(' ').Append(token);
+                }
+            }
+
+            return payee.ToString();
+        }
+
+        /// <summary>The bank cuts payee names in the two-column layout at this many characters.</summary>
+        private const int PayeeNameMaxLength = 30;
+
+        /// <summary>
+        /// <see cref="StripCompanySuffix"/> + <see cref="CleanseAndHealText"/>, except that a 1–2 letter word
+        /// ending a name the bank cut at <see cref="PayeeNameMaxLength"/> characters is what is left of the
+        /// last word ("SEGUROS EJEMPLO NE W YORK LI" → "... NEW YORK LI"), not a fragment to weld onto the word
+        /// before it. Only when no suffix was cut off: "... QUERETA RO SA" still heals to "QUERETARO".
+        /// </summary>
+        internal static string CleanTwoColumnPayeeName(string rawName)
+        {
+            string stripped = StripCompanySuffix(rawName);
+            Match cutOffWord = Regex.Match(rawName, @"\s([A-Za-z]{1,2})\s*$");
+
+            bool cutAtMaxLength = Regex.Replace(rawName, @"\s+", " ").Trim().Length == PayeeNameMaxLength;
+            if (cutAtMaxLength && cutOffWord.Success && stripped.Trim() == rawName.Trim())
+            {
+                return CleanseAndHealText(rawName[..cutOffWord.Index]) + " " + cutOffWord.Groups[1].Value;
+            }
+
+            // A suffix cut right after a comma ("... ONAL,SA D") leaves the comma behind
+            return CleanseAndHealText(stripped).TrimEnd(',', ' ');
+        }
+
+        /// <summary>The full "Nombre del Cliente:" value, wrapped lines included, or an empty string.</summary>
+        private static string ExtractWrappedClientName(string pageText)
+        {
+            Match clientMatch = Regex.Match(pageText, @"Nombre\s+del\s+Cliente:[ \t]*([^\r\n]*)", RegexOptions.IgnoreCase);
+            if (!clientMatch.Success) return string.Empty;
+
+            int nextLine = pageText.IndexOf('\n', clientMatch.Index);
+            return nextLine < 0
+                ? clientMatch.Groups[1].Value
+                : string.Join(" ", WrappedLinesAfter(pageText, nextLine + 1).Prepend(clientMatch.Groups[1].Value));
+        }
+
+        /// <summary>
+        /// The lines from <paramref name="start"/> on that continue a wrapped value: non-blank, starting at the
+        /// left margin and holding no "Label:" (a trailing "Dato no verificado..." aside). Stops at the first other.
+        /// </summary>
+        private static IEnumerable<string> WrappedLinesAfter(string pageText, int start)
+        {
+            if (start >= pageText.Length) yield break;
+
+            foreach (string rawLine in pageText[start..].Split('\n'))
+            {
+                string line = rawLine.TrimEnd('\r');
+                bool isWrapped = line.Length > 0
+                    && !char.IsWhiteSpace(line[0])
+                    && !Regex.Replace(line, @"Dato\s*no\s*verificado.*$", "", RegexOptions.IgnoreCase).Contains(':');
+
+                if (!isWrapped) yield break;
+                yield return line;
+            }
+        }
+
+        /// <summary>
+        /// The wrapped lines of a reason. Besides <see cref="WrappedLinesAfter"/>'s rules they must be upper case:
+        /// reasons are printed in capitals, while unindented lines that are not part of them are section headers
+        /// ("Datos de confirmación de la transferencia") or the start of a label wrapped before its colon
+        /// ("Fecha y hora de" / "Alta: ...").
+        /// </summary>
+        private static IEnumerable<string> WrappedReasonLinesAfter(string pageText, int start) =>
+            WrappedLinesAfter(pageText, start)
+                .TakeWhile(line => !line.Any(char.IsLower) && !line.StartsWith("DETALLES", StringComparison.Ordinal));
 
         internal static string CleanVendorName(string rawVendor)
         {
